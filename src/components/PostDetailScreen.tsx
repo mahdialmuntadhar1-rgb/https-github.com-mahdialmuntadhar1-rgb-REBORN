@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Screen, FeedPost, Comment } from '../types';
-import { APP_COLORS, TYPOGRAPHY, MOCK_BUSINESSES } from '../constants';
+import { MOCK_BUSINESSES } from '../constants';
 import { ArrowLeft, Send } from 'lucide-react';
 import FeedPostCard from './FeedPostCard';
-import { motion } from 'framer-motion';
 
 interface Props {
   push: (screen: Screen, props?: Record<string, any>) => void;
@@ -88,46 +87,20 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
   };
 
   return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: APP_COLORS.BACKGROUND,
-      zIndex: 100,
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <style>
-        {`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}
-      </style>
-
+    <div className="absolute inset-0 bg-background z-[100] flex flex-col">
       {/* Header */}
-      <div style={{
-        padding: '15px 20px',
-        backgroundColor: APP_COLORS.SURFACE,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 15,
-        borderBottom: `1px solid ${APP_COLORS.BORDER}`,
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
-        flexDirection: isRTL ? 'row' : 'row-reverse'
-      }}>
-        <ArrowLeft size={24} color={APP_COLORS.TEXT_PRIMARY} onClick={pop} style={{ cursor: 'pointer', transform: isRTL ? 'none' : 'rotate(180deg)' }} />
-        <h2 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t('postDetail')}</h2>
+      <div className="px-5 py-4 bg-surface flex items-center gap-4 border-b border-border sticky top-0 z-10">
+        <ArrowLeft 
+          size={24} 
+          className="text-text-primary cursor-pointer rtl:rotate-0 ltr:rotate-180" 
+          onClick={pop} 
+        />
+        <h2 className="font-bold text-lg m-0 text-text-primary">{t('postDetail')}</h2>
       </div>
 
       {/* Content */}
       <div 
-        style={{ flex: 1, overflowY: 'auto', paddingBottom: 80 }}
+        className="flex-1 overflow-y-auto pb-20"
         onScroll={(e) => {
           if (e.currentTarget.scrollTop < -50 && !isRefreshing) {
             handleRefresh();
@@ -135,19 +108,12 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
         }}
       >
         {isRefreshing && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 20 }}>
-            <div style={{
-              width: 24,
-              height: 24,
-              border: `2px solid ${APP_COLORS.BORDER}`,
-              borderTopColor: APP_COLORS.PRIMARY,
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }} />
+          <div className="flex justify-center p-5">
+            <div className="w-6 h-6 border-2 border-border border-t-primary rounded-full animate-spin" />
           </div>
         )}
 
-        <div style={{ padding: '15px 15px 0' }}>
+        <div className="p-4 pt-4">
           <FeedPostCard 
             post={post} 
             onCommentClick={() => {}} 
@@ -161,33 +127,33 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
         </div>
 
         {/* Comments Section */}
-        <div style={{ padding: '0 20px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexDirection: isRTL ? 'row' : 'row-reverse' }}>
-            <div style={{ flex: 1, height: 1, backgroundColor: APP_COLORS.BORDER }} />
-            <span style={{ color: APP_COLORS.TEXT_SECONDARY, fontSize: 14, fontWeight: 500 }}>
+        <div className="px-5 pb-5">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-text-secondary text-sm font-medium">
               {t('comments')} ({post.comments + (comments.length - INITIAL_COMMENTS.length)})
             </span>
-            <div style={{ flex: 1, height: 1, backgroundColor: APP_COLORS.BORDER }} />
+            <div className="flex-1 h-px bg-border" />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div className="flex flex-col gap-5">
             {visibleComments.map(comment => (
-              <div key={comment.id} style={{ display: 'flex', gap: 12, flexDirection: isRTL ? 'row' : 'row-reverse' }}>
+              <div key={comment.id} className="flex gap-3">
                 <img 
                   src={comment.author.avatar} 
                   alt={comment.author.name} 
-                  style={{ width: 36, height: 36, borderRadius: 18, objectFit: 'cover' }} 
+                  className="w-9 h-9 rounded-full object-cover" 
                 />
-                <div style={{ flex: 1, textAlign: isRTL ? 'right' : 'left' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexDirection: isRTL ? 'row' : 'row-reverse' }}>
-                    <span style={{ fontWeight: 600, fontSize: 14, color: APP_COLORS.TEXT_PRIMARY }}>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-sm text-text-primary">
                       {comment.author.name}
                     </span>
-                    <span style={{ fontSize: 12, color: APP_COLORS.TEXT_MUTED }}>
+                    <span className="text-xs text-text-muted">
                       {comment.timeAgo}
                     </span>
                   </div>
-                  <p style={{ margin: 0, fontSize: 14, color: APP_COLORS.TEXT_PRIMARY, lineHeight: 1.4 }}>
+                  <p className="m-0 text-sm text-text-primary leading-relaxed">
                     {comment.text}
                   </p>
                 </div>
@@ -199,30 +165,10 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
             <button 
               onClick={handleLoadMore}
               disabled={isLoadingMore}
-              style={{
-                width: '100%',
-                padding: 12,
-                backgroundColor: APP_COLORS.SURFACE,
-                border: `1px solid ${APP_COLORS.BORDER}`,
-                borderRadius: 12,
-                color: APP_COLORS.PRIMARY,
-                ...TYPOGRAPHY.headline,
-                fontSize: 14,
-                cursor: 'pointer',
-                marginTop: 20,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
+              className="w-full p-3 bg-surface border border-border rounded-xl text-primary font-bold text-sm cursor-pointer mt-5 flex justify-center items-center hover:bg-background transition-colors"
             >
               {isLoadingMore ? (
-                <div style={{
-                  width: 18, height: 18, 
-                  border: `2px solid ${APP_COLORS.PRIMARY}`, 
-                  borderTopColor: 'transparent', 
-                  borderRadius: '50%', 
-                  animation: 'spin 1s linear infinite'
-                }} />
+                <div className="w-[18px] h-[18px] border-2 border-primary border-t-transparent rounded-full animate-spin" />
               ) : `${t('loadMore')} ↓`}
             </button>
           )}
@@ -230,52 +176,18 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
       </div>
 
       {/* Add Comment Input */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: APP_COLORS.SURFACE,
-        borderTop: `1px solid ${APP_COLORS.BORDER}`,
-        padding: '12px 20px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-        flexDirection: isRTL ? 'row' : 'row-reverse'
-      }}>
+      <div className="absolute bottom-0 left-0 right-0 bg-surface border-t border-border px-5 py-3 flex items-center gap-3 pb-[max(12px,env(safe-area-inset-bottom))]">
         <img 
           src="https://i.pravatar.cc/150?img=33" 
           alt="You" 
-          style={{ width: 36, height: 36, borderRadius: 18, objectFit: 'cover' }} 
+          className="w-9 h-9 rounded-full object-cover" 
         />
-        <div style={{
-          flex: 1,
-          backgroundColor: APP_COLORS.BACKGROUND,
-          borderRadius: 20,
-          padding: '8px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          border: `1px solid ${APP_COLORS.BORDER}`,
-          flexDirection: isRTL ? 'row' : 'row-reverse'
-        }}>
+        <div className="flex-1 bg-background rounded-full px-4 py-2 flex items-center border border-border">
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={t('writeCaption')}
-            style={{
-              flex: 1,
-              border: 'none',
-              background: 'transparent',
-              outline: 'none',
-              resize: 'none',
-              fontSize: 14,
-              color: APP_COLORS.TEXT_PRIMARY,
-              fontFamily: 'inherit',
-              maxHeight: 80,
-              minHeight: 20,
-              textAlign: isRTL ? 'right' : 'left'
-            }}
+            className="flex-1 border-none bg-transparent outline-none resize-none text-sm text-text-primary font-inherit max-h-20 min-h-[20px] placeholder:text-text-muted"
             rows={1}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -288,19 +200,9 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
         <button 
           onClick={handleSend}
           disabled={!newComment.trim()}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 8,
-            cursor: newComment.trim() ? 'pointer' : 'default',
-            opacity: newComment.trim() ? 1 : 0.5,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transform: isRTL ? 'none' : 'rotate(180deg)'
-          }}
+          className={`bg-transparent border-none p-2 flex items-center justify-center rtl:rotate-0 ltr:rotate-180 ${newComment.trim() ? 'cursor-pointer opacity-100' : 'cursor-default opacity-50'}`}
         >
-          <Send size={24} color={APP_COLORS.PRIMARY} />
+          <Send size={24} className="text-primary" />
         </button>
       </div>
     </div>

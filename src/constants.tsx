@@ -2,22 +2,24 @@ import React from 'react';
 import { Business, Story, FeedPost, HeroSlide, Category, Notification, AppUser, Reel } from './types';
 import { GOVERNORATES } from './constants/governorates';
 
-export { GOVERNORATES };
+import { businesses as MOCK_BUSINESSES } from './data/businesses';
+
+export { GOVERNORATES, MOCK_BUSINESSES };
 
 export const APP_COLORS = {
-  PRIMARY: '#FF6B6B',
-  SECONDARY: '#4ECDC4',
-  BACKGROUND: '#0a0a0f', // Updated to match Phase 2/3 dark theme
-  SURFACE: '#1a1a1f',    // Updated to match Phase 2/3 dark theme
-  TEXT_PRIMARY: '#FFFFFF',
-  TEXT_SECONDARY: '#8A8A8A',
-  TEXT_MUTED: '#4A4A4F',
-  BORDER: '#2A2A2F',
-  SHADOW: 'rgba(0,0,0,0.3)',
-  PREMIUM_GOLD: '#F6C90E',
-  LIVE_RED: '#FF3B30',
-  SUCCESS: '#34C759',
-  UNREAD_BG: '#1A1A2F',
+  PRIMARY: '#1a56db',
+  SECONDARY: '#f59e0b',
+  BACKGROUND: '#f8fafc',
+  SURFACE: '#ffffff',
+  TEXT_PRIMARY: '#0f172a',
+  TEXT_SECONDARY: '#475569',
+  TEXT_MUTED: '#94a3b8',
+  BORDER: '#e2e8f0',
+  SHADOW: 'rgba(0,0,0,0.05)',
+  PREMIUM_GOLD: '#f59e0b',
+  LIVE_RED: '#ef4444',
+  SUCCESS: '#10b981',
+  UNREAD_BG: '#eff6ff',
 };
 
 export const TYPOGRAPHY = {
@@ -92,84 +94,6 @@ export const CATEGORIES: Category[] = [
   { id: 'clinics', icon: '🏥', nameKey: 'clinics', eventCount: 31 },
   { id: 'hotels', icon: '🏨', nameKey: 'hotels', eventCount: 18 },
   { id: 'shopping', icon: '🛍️', nameKey: 'shopping', eventCount: 55, recommended: true },
-];
-
-export const MOCK_BUSINESSES: Business[] = [
-  {
-    id: 'b1', 
-    nameAr: 'مقهى الحديقة الخضراء',
-    nameKu: 'کافێی بُستانی سەوز',
-    nameEn: 'Green Garden Cafe',
-    descriptionAr: 'مقهى فاخر على السطح مع قهوة متخصصة وإطلالات بانورامية على بغداد.',
-    descriptionKu: 'کافێیەک لەسەر سەربان بە قاوەی تایبەت و دیمەنی پانۆرامای بەغدا.',
-    descriptionEn: 'Premium rooftop cafe with specialty coffee and panoramic Baghdad views.',
-    category: 'cafes',
-    governorateId: 'baghdad',
-    phone: '+964 770 111 2233',
-    address: 'Karrada St., Baghdad',
-    logoUrl: 'https://picsum.photos/seed/cafe-logo/100/100',
-    coverUrl: 'https://picsum.photos/seed/cafe-coffee/800/400',
-    isOpen: true,
-    isVerified: true,
-    isPremium: true,
-    isFeatured: true,
-    rating: 4.8,
-    reviewCount: 247,
-    priceRange: '$$',
-    tags: ['coffee', 'rooftop', 'wifi'],
-    status: 'approved',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'b2', 
-    nameAr: 'مشاوي بغداد', 
-    nameKu: 'گرێلی بەغدا',
-    nameEn: 'Baghdad Grill',
-    descriptionAr: 'مشاوي عراقية أصيلة في قلب المنصور.',
-    descriptionKu: 'کەبابی عێراقی ڕەسەن لە دڵی مەنسور.',
-    descriptionEn: 'Authentic Iraqi grills in the heart of Mansour.',
-    category: 'restaurants',
-    governorateId: 'baghdad',
-    phone: '+964 780 222 3344',
-    address: 'Mansour, Baghdad',
-    logoUrl: 'https://picsum.photos/seed/grill-logo/100/100',
-    coverUrl: 'https://picsum.photos/seed/grill-restaurant/800/400',
-    isOpen: true,
-    isVerified: true,
-    isPremium: false,
-    isFeatured: true,
-    rating: 4.5,
-    reviewCount: 182,
-    priceRange: '$$$',
-    tags: ['grill', 'traditional', 'family'],
-    status: 'approved',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'b3', 
-    nameAr: 'بلو جيم', 
-    nameKu: 'جیمی شین',
-    nameEn: 'Blue Gym',
-    descriptionAr: 'صالة رياضية حديثة مع مدربين شخصيين وحصص تدريبية.',
-    descriptionKu: 'هۆڵێکی وەرزشی مۆدێرن لەگەڵ ڕاهێنەری تایبەت.',
-    descriptionEn: 'State-of-the-art gym with personal trainers and classes.',
-    category: 'gyms',
-    governorateId: 'baghdad',
-    phone: '+964 750 333 4455',
-    address: 'Jadriyah, Baghdad',
-    logoUrl: 'https://picsum.photos/seed/gym-logo/100/100',
-    coverUrl: 'https://picsum.photos/seed/gym-fitness/800/400',
-    isOpen: true,
-    isVerified: true,
-    isPremium: false,
-    isFeatured: false,
-    rating: 4.2,
-    reviewCount: 95,
-    priceRange: '$$',
-    tags: ['fitness', 'workout', 'personal-training'],
-    status: 'approved',
-    createdAt: new Date().toISOString()
-  },
 ];
 
 export const MOCK_STORIES: Story[] = [

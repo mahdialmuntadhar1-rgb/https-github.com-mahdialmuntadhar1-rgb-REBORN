@@ -33,7 +33,7 @@ export default function FeedPostCard({ post, onCommentClick, onBusinessClick, is
   return (
     <motion.div 
       whileHover={{ translateY: -2 }}
-      className="bg-[#1a1a2f] rounded-2xl mb-5 shadow-xl overflow-hidden border border-white/5"
+      className="bg-surface rounded-2xl mb-5 shadow-sm overflow-hidden border border-border"
     >
       {/* Header */}
       <div className="p-4 flex justify-between items-center">
@@ -45,15 +45,15 @@ export default function FeedPostCard({ post, onCommentClick, onBusinessClick, is
             <img 
               src={post.avatar} 
               alt={post.businessName} 
-              className="w-10 h-10 rounded-full object-cover border border-white/10" 
+              className="w-10 h-10 rounded-full object-cover border border-border" 
             />
             {post.businessId && (
-              <div className="absolute -top-1 inset-inline-start-[-4px] bg-primary rounded-full px-1.5 py-0.5 flex items-center justify-center border border-[#1a1a2f] shadow-lg z-10">
+              <div className="absolute -top-1 inset-inline-start-[-4px] bg-primary rounded-full px-1.5 py-0.5 flex items-center justify-center border border-surface shadow-sm z-10">
                 <span className="text-[7px] font-black text-white uppercase tracking-tighter">BIZ</span>
               </div>
             )}
             {post.verified && (
-              <div className="absolute -bottom-1 inset-inline-end-[-4px] bg-secondary rounded-full w-4 h-4 flex items-center justify-center border-2 border-[#1a1a2f]">
+              <div className="absolute -bottom-1 inset-inline-end-[-4px] bg-secondary rounded-full w-4 h-4 flex items-center justify-center border-2 border-surface">
                 <CheckCircle2 size={10} className="text-white" />
               </div>
             )}
@@ -61,32 +61,32 @@ export default function FeedPostCard({ post, onCommentClick, onBusinessClick, is
           <div className="text-start">
             <button 
               onClick={() => post.businessId && onBusinessClick(post.businessId)}
-              className="text-sm font-bold text-white hover:text-primary transition-colors"
+              className="text-sm font-bold text-text-primary hover:text-primary transition-colors"
             >
               {businessName}
             </button>
-            <div className="flex items-center gap-2 text-[10px] text-white/40">
+            <div className="flex items-center gap-2 text-[10px] text-text-muted">
               <span>{post.category}</span>
               <span>•</span>
               <span>{post.timeAgo}</span>
             </div>
           </div>
         </div>
-        <button className="text-white/20 hover:text-white/40 transition-colors">
+        <button className="text-text-muted hover:text-text-primary transition-colors">
           <MoreHorizontal size={20} />
         </button>
       </div>
 
       {/* Content */}
       <div className="px-4 pb-3 text-start">
-        <p className="text-sm leading-relaxed text-white/80">
+        <p className="text-sm leading-relaxed text-text-secondary">
           {caption}
         </p>
       </div>
 
       {/* Media */}
       {post.media && (
-        <div className="relative w-full aspect-[4/3] bg-black/20">
+        <div className="relative w-full aspect-[4/3] bg-background">
           <img 
             src={post.media} 
             alt="Post content" 
@@ -102,7 +102,7 @@ export default function FeedPostCard({ post, onCommentClick, onBusinessClick, is
       )}
 
       {/* Actions */}
-      <div className="p-4 flex justify-between items-center">
+      <div className="p-4 flex justify-between items-center border-t border-border">
         <div className="flex gap-6">
           <button 
             onClick={toggleLike}
@@ -114,26 +114,26 @@ export default function FeedPostCard({ post, onCommentClick, onBusinessClick, is
             >
               <Heart 
                 size={20} 
-                className={isLiked ? 'text-primary fill-primary' : 'text-white/40 hover:text-white/60'} 
+                className={isLiked ? 'text-primary fill-primary' : 'text-text-muted hover:text-text-secondary'} 
               />
             </motion.div>
-            <span className={`text-xs font-bold ${isLiked ? 'text-primary' : 'text-white/40'}`}>{likesCount}</span>
+            <span className={`text-xs font-bold ${isLiked ? 'text-primary' : 'text-text-muted'}`}>{likesCount}</span>
           </button>
           
           <button 
             onClick={onCommentClick}
-            className="flex items-center gap-2 text-white/40 hover:text-white/60 transition-colors"
+            className="flex items-center gap-2 text-text-muted hover:text-text-secondary transition-colors"
           >
             <MessageCircle size={20} />
             <span className="text-xs font-bold">{post.comments}</span>
           </button>
           
-          <button className="text-white/40 hover:text-white/60 transition-colors">
+          <button className="text-text-muted hover:text-text-secondary transition-colors">
             <Share2 size={20} />
           </button>
         </div>
         
-        <div className="flex items-center gap-1.5 text-white/30">
+        <div className="flex items-center gap-1.5 text-text-muted">
           <MapPin size={12} />
           <span className="text-[10px] font-medium">
             {post.governorate.charAt(0).toUpperCase() + post.governorate.slice(1)}

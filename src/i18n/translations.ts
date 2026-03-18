@@ -8,6 +8,7 @@ export const translations: Record<Language, Record<string, string>> = {
     nav_add: 'إضافة',
     nav_notifications: 'التنبيهات',
     nav_profile: 'حسابي',
+    nav_dashboard: 'لوحة التحكم',
     tab_shakumaku: 'شكو ماكو',
     tab_madinaty: 'مدينتي',
     hero_slogan_1: 'اكتشف أفضل الأماكن في العراق',
@@ -26,17 +27,32 @@ export const translations: Record<Language, Record<string, string>> = {
     auth_regular_user: 'مستخدم عادي',
     auth_select_city: 'اختر مدينتك',
     auth_select_language: 'اختر اللغة',
+    auth_phone_optional: 'رقم الهاتف (اختياري)',
+    auth_otp_sent: 'تم إرسال رمز التحقق',
+    auth_otp_verify: 'تحقق',
+    auth_otp_resend: 'إعادة إرسال الرمز',
+    auth_otp_timer: 'إعادة إرسال بعد',
+    auth_setup_name: 'الاسم الكامل',
+    auth_setup_avatar: 'اختر صورة شخصية',
     business_claim_title: 'هل هذا عملك؟',
     business_claim_body: 'قم بتمثيل عملك وتواصل مع زبائنك بشكل أفضل.',
     business_claim_disclaimer: 'يخضع الطلب للمراجعة والتحقق.',
     business_unclaimed_banner: 'هذا العمل غير مطالب به بعد.',
     business_verify_badge: 'موثق',
+    business_verified: 'حساب موثق',
+    business_open: 'مفتوح الآن',
+    business_closed: 'مغلق',
+    business_call: 'اتصال',
+    business_map: 'الخريطة',
+    business_share: 'مشاركة',
     feed_no_posts: 'لا توجد منشورات حالياً',
     feed_load_more: 'تحميل المزيد',
     feed_reels_title: 'ريبورن ريلز',
     feed_no_posts_city: 'لا يوجد منشورات في هذه المدينة بعد — كن أول من ينشر!',
     madinaty_search_placeholder: 'ابحث عن مطعم، عيادة، محل...',
     madinaty_no_businesses: 'لا يوجد أعمال تجارية في هذه الفئة حالياً',
+    search_recent: 'عمليات البحث الأخيرة',
+    search_clear: 'مسح',
     all: 'الكل',
     cafes: 'مقاهي',
     restaurants: 'مطاعم',
@@ -46,6 +62,9 @@ export const translations: Record<Language, Record<string, string>> = {
     shopping: 'تسوق',
     action_add_post: 'إضافة منشور',
     action_add_business: 'إضافة عملي التجاري',
+    action_like: 'إعجاب',
+    action_comment: 'تعليق',
+    action_share: 'مشاركة',
     slogan_1_ar: 'أول تطبيق اجتماعي عراقي',
     slogan_1_ku: 'یەکەم ئەپی کۆمەڵایەتی عێراقی',
     slogan_1_en: "Iraq's first social app",
@@ -63,7 +82,13 @@ export const translations: Record<Language, Record<string, string>> = {
     slogan_5_en: "Start your business — we'll introduce you",
     pwa_install_banner: 'ثبت تطبيق ريبورن لتجربة أفضل وأسرع!',
     pwa_install_btn: 'تثبيت الآن',
-    pwa_dismiss: 'ليس الآن'
+    pwa_dismiss: 'ليس الآن',
+    general_loading: 'جاري التحميل...',
+    general_error: 'حدث خطأ ما',
+    general_success: 'تمت العملية بنجاح',
+    general_back: 'رجوع',
+    general_save: 'حفظ',
+    general_cancel: 'إلغاء'
   },
   ku: {
     nav_home: 'سەرەکی',
@@ -71,6 +96,7 @@ export const translations: Record<Language, Record<string, string>> = {
     nav_add: 'زیادکردن',
     nav_notifications: 'ئاگادارییەکان',
     nav_profile: 'پڕۆفایل',
+    nav_dashboard: 'داشبۆرد',
     tab_shakumaku: 'شێخە چنیا',
     tab_madinaty: 'شاری من',
     hero_slogan_1: 'باشترین شوێنەکانی عێراق بدۆزەرەوە',
@@ -89,26 +115,44 @@ export const translations: Record<Language, Record<string, string>> = {
     auth_regular_user: 'بەکارهێنەری ئاسایی',
     auth_select_city: 'شارەکەت هەڵبژێرە',
     auth_select_language: 'زمان هەڵبژێرە',
+    auth_phone_optional: 'ژمارەی مۆبایل (ئارەزوومەندانە)',
+    auth_otp_sent: 'کۆدی پشتڕاستکردنەوە نێردرا',
+    auth_otp_verify: 'پشتڕاستکردنەوە',
+    auth_otp_resend: 'ناردنەوەی کۆد',
+    auth_otp_timer: 'ناردنەوە دوای',
+    auth_setup_name: 'ناوی تەواو',
+    auth_setup_avatar: 'وێنەیەک هەڵبژێرە',
     business_claim_title: 'ئایا ئەمە کارەکەی تۆیە؟',
     business_claim_body: 'نوێنەرایەتی کارەکەت بکە و باشتر پەیوەندی بە کڕیارەکانتەوە بکە.',
     business_claim_disclaimer: 'داواکارییەکە پێویستی بە پێداچوونەوە و پشتڕاستکردنەوە هەیە.',
     business_unclaimed_banner: 'ئەم کارە هێشتا داوا نەکراوە.',
     business_verify_badge: 'پشتڕاستکراوە',
+    business_verified: 'هەژماری پشتڕاستکراو',
+    business_open: 'ئێستا کراوەیە',
+    business_closed: 'داخراوە',
+    business_call: 'پەیوەندی',
+    business_map: 'نەخشە',
+    business_share: 'هاوبەشکردن',
     feed_no_posts: 'لە ئێستادا هیچ پۆستێک نییە',
     feed_load_more: 'زیاتر ببینە',
     feed_reels_title: 'ڕیبۆرن ڕیڵز',
     feed_no_posts_city: 'هێشتا پۆستێک لەم شارەدا نییە — یەکەم کەس بە کە پۆست دەکات!',
-    madinaty_search_placeholder: 'گەڕان بکە بۆ چێشتخانە، نۆرینگە، دوکان...',
-    madinaty_no_businesses: 'لە ئێستادا هیچ بازرگانییەک لەم پۆلەدا نییە',
+    madinaty_search_placeholder: 'بگەڕێ بۆ چێشتخانە، نۆرینگە، فرۆشگا...',
+    madinaty_no_businesses: 'لە ئێستادا هیچ کارێک لەم پۆلێنەدا نییە',
+    search_recent: 'گەڕانەکانی پێشوو',
+    search_clear: 'سڕینەوە',
     all: 'هەمووی',
     cafes: 'کافێکان',
     restaurants: 'چێشتخانەکان',
     gyms: 'هۆڵە وەرزشییەکان',
     clinics: 'نۆرینگەکان',
-    hotels: 'وتێلەکان',
+    hotels: 'هوتێلەکان',
     shopping: 'بازاڕکردن',
-    action_add_post: 'پۆست زیاد بکە',
-    action_add_business: 'کارەکەم زیاد بکە',
+    action_add_post: 'زیادکردنی پۆست',
+    action_add_business: 'زیادکردنی کارەکەم',
+    action_like: 'بەدڵبوون',
+    action_comment: 'کۆمێنت',
+    action_share: 'هاوبەشکردن',
     slogan_1_ar: 'أول تطبيق اجتماعي عراقي',
     slogan_1_ku: 'یەکەم ئەپی کۆمەڵایەتی عێراقی',
     slogan_1_en: "Iraq's first social app",
@@ -124,45 +168,67 @@ export const translations: Record<Language, Record<string, string>> = {
     slogan_5_ar: 'ابدأ مشروعك — نحن نعرّفك عليهم',
     slogan_5_ku: 'پڕۆژەکەت دەستپێبکە — ئێمە پێشانی دەدەین',
     slogan_5_en: "Start your business — we'll introduce you",
-    pwa_install_banner: 'بۆ ئەزموونێکی باشتر و خێراتر ئەپی ڕیبۆرن دابەزێنە!',
-    pwa_install_btn: 'ئێستا دایبەزێنە',
-    pwa_dismiss: 'ئێستا نا'
+    pwa_install_banner: 'ئەپی ڕیبۆرن دابەزێنە بۆ ئەزموونێکی خێراتر و باشتر!',
+    pwa_install_btn: 'دابەزاندن',
+    pwa_dismiss: 'نەخێر سوپاس',
+    general_loading: 'چاوەڕێ بکە...',
+    general_error: 'هەڵەیەک ڕوویدا',
+    general_success: 'سەرکەوتوو بوو',
+    general_back: 'گەڕانەوە',
+    general_save: 'پاشەکەوتکردن',
+    general_cancel: 'پاشگەزبوونەوە'
   },
   en: {
     nav_home: 'Home',
     nav_explore: 'Explore',
     nav_add: 'Add',
-    nav_notifications: 'Notifications',
+    nav_notifications: 'Alerts',
     nav_profile: 'Profile',
-    tab_shakumaku: 'Shakumaku',
+    nav_dashboard: 'Dashboard',
+    tab_shakumaku: 'Shaku Maku',
     tab_madinaty: 'My City',
     hero_slogan_1: 'Discover the best places in Iraq',
     hero_slogan_2: 'Everything you need in your city',
     hero_slogan_3: 'Connect with local businesses',
-    hero_slogan_4: 'Comprehensive guide for all governorates',
-    hero_slogan_5: 'Be part of the REBORN community',
-    auth_welcome: 'Welcome to REBORN',
+    hero_slogan_4: 'Your comprehensive guide to all governorates',
+    hero_slogan_5: 'Be part of the Reborn community',
+    auth_welcome: 'Welcome to Reborn',
     auth_signin: 'Sign In',
     auth_signup: 'Sign Up',
-    auth_google: 'Sign in with Google',
-    auth_phone: 'Sign in with Phone',
+    auth_google: 'Continue with Google',
+    auth_phone: 'Continue with Phone',
     auth_skip: 'Skip for now',
     auth_are_you_business: 'Are you a business owner?',
     auth_business_owner: 'Business Owner',
     auth_regular_user: 'Regular User',
     auth_select_city: 'Select your city',
-    auth_select_language: 'Select Language',
+    auth_select_language: 'Select language',
+    auth_phone_optional: 'Phone number (optional)',
+    auth_otp_sent: 'Verification code sent',
+    auth_otp_verify: 'Verify',
+    auth_otp_resend: 'Resend code',
+    auth_otp_timer: 'Resend in',
+    auth_setup_name: 'Full Name',
+    auth_setup_avatar: 'Choose a profile picture',
     business_claim_title: 'Is this your business?',
-    business_claim_body: 'Represent your business and connect better with your customers.',
+    business_claim_body: 'Represent your business and connect with your customers better.',
     business_claim_disclaimer: 'Request is subject to review and verification.',
     business_unclaimed_banner: 'This business is not claimed yet.',
     business_verify_badge: 'Verified',
-    feed_no_posts: 'No posts available right now',
+    business_verified: 'Verified Account',
+    business_open: 'Open Now',
+    business_closed: 'Closed',
+    business_call: 'Call',
+    business_map: 'Map',
+    business_share: 'Share',
+    feed_no_posts: 'No posts available currently',
     feed_load_more: 'Load More',
-    feed_reels_title: 'REBORN Reels',
-    feed_no_posts_city: 'No posts in this city yet — be the first!',
+    feed_reels_title: 'Reborn Reels',
+    feed_no_posts_city: 'No posts in this city yet — be the first to post!',
     madinaty_search_placeholder: 'Search for restaurant, clinic, shop...',
-    madinaty_no_businesses: 'No businesses in this category yet',
+    madinaty_no_businesses: 'No businesses in this category currently',
+    search_recent: 'Recent Searches',
+    search_clear: 'Clear',
     all: 'All',
     cafes: 'Cafes',
     restaurants: 'Restaurants',
@@ -170,8 +236,11 @@ export const translations: Record<Language, Record<string, string>> = {
     clinics: 'Clinics',
     hotels: 'Hotels',
     shopping: 'Shopping',
-    action_add_post: 'Add a post',
-    action_add_business: 'Add my business',
+    action_add_post: 'Add Post',
+    action_add_business: 'Add My Business',
+    action_like: 'Like',
+    action_comment: 'Comment',
+    action_share: 'Share',
     slogan_1_ar: 'أول تطبيق اجتماعي عراقي',
     slogan_1_ku: 'یەکەم ئەپی کۆمەڵایەتی عێراقی',
     slogan_1_en: "Iraq's first social app",
@@ -187,33 +256,32 @@ export const translations: Record<Language, Record<string, string>> = {
     slogan_5_ar: 'ابدأ مشروعك — نحن نعرّفك عليهم',
     slogan_5_ku: 'پڕۆژەکەت دەستپێبکە — ئێمە پێشانی دەدەین',
     slogan_5_en: "Start your business — we'll introduce you",
-    pwa_install_banner: 'Install REBORN for a better and faster experience!',
+    pwa_install_banner: 'Install Reborn app for a better and faster experience!',
     pwa_install_btn: 'Install Now',
-    pwa_dismiss: 'Not Now'
+    pwa_dismiss: 'Not Now',
+    general_loading: 'Loading...',
+    general_error: 'An error occurred',
+    general_success: 'Success',
+    general_back: 'Back',
+    general_save: 'Save',
+    general_cancel: 'Cancel'
   }
 };
 
-export const t = (key: string, language: Language, governorateId?: string): string => {
-  let text = translations[language][key] || key;
+// Add governorates to translations
+GOVERNORATES.forEach(gov => {
+  translations.ar[gov.id] = gov.nameAr;
+  translations.ku[gov.id] = gov.nameKu;
+  translations.en[gov.id] = gov.nameEn;
+});
 
-  if (governorateId) {
-    const gov = GOVERNORATES.find(g => g.id === governorateId);
-    if (gov) {
-      const govName = language === 'ar' ? gov.nameAr : language === 'ku' ? gov.nameKu : gov.nameEn;
-      
-      if (key === 'tab_shakumaku') {
-        if (language === 'ar') return `شكو ماكو ${govName}`;
-        if (language === 'ku') return `شێخە چنیا - ${govName}`;
-        if (language === 'en') return `Shakumaku · ${govName}`;
-      }
-      
-      if (key === 'tab_madinaty') {
-        if (language === 'ar') return `مدينتي ${govName}`;
-        if (language === 'ku') return `شاری ${govName}`;
-        if (language === 'en') return `${govName} Guide`;
-      }
-    }
+export const t = (key: string, lang: Language, govId?: string): string => {
+  let text = translations[lang][key] || translations['en'][key] || key;
+  
+  if (govId) {
+    const govName = translations[lang][govId] || govId;
+    text = text.replace('{city}', govName);
   }
-
+  
   return text;
 };

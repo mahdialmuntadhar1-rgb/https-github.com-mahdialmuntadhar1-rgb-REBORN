@@ -55,92 +55,42 @@ export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode =
       animate={{ y: 0 }}
       exit={{ y: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: APP_COLORS.BACKGROUND,
-        zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto'
-      }}
+      className="fixed inset-0 bg-background z-[1000] flex flex-col overflow-y-auto"
     >
       {/* Header */}
-      <div style={{
-        padding: '15px 20px',
-        backgroundColor: APP_COLORS.SURFACE,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: `1px solid ${APP_COLORS.BORDER}`,
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
-      }}>
+      <div className="p-4 bg-surface flex justify-between items-center border-b border-border sticky top-0 z-10">
         <button 
           onClick={pop}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 4, 
-            background: 'none', 
-            border: 'none', 
-            color: APP_COLORS.TEXT_PRIMARY,
-            cursor: 'pointer',
-            fontSize: 14,
-            fontWeight: 600
-          }}
+          className="flex items-center gap-1 bg-transparent border-none text-text-primary cursor-pointer text-sm font-semibold"
         >
           <X size={20} />
           {t('cancel')}
         </button>
-        <h2 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t('addPost')}</h2>
+        <h2 className="m-0 text-lg font-bold">{t('addPost')}</h2>
         <button 
           onClick={handleShare}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 4, 
-            background: 'none', 
-            border: 'none', 
-            color: APP_COLORS.PRIMARY,
-            cursor: 'pointer',
-            fontSize: 14,
-            fontWeight: 600
-          }}
+          className="flex items-center gap-1 bg-transparent border-none text-primary cursor-pointer text-sm font-semibold"
         >
           {t('share')}
           <Send size={18} />
         </button>
       </div>
 
-      <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div className="p-5 flex flex-col gap-5">
         {/* Business Selector */}
-        <div style={{ position: 'relative' }}>
-          <label style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY, marginBottom: 8, display: 'block' }}>{t('selectBusiness')}</label>
+        <div className="relative">
+          <label className="text-xs text-text-secondary mb-2 block">{t('selectBusiness')}</label>
           <div 
             onClick={() => setShowBusinessDropdown(!showBusinessDropdown)}
-            style={{
-              padding: '12px 16px',
-              backgroundColor: `${APP_COLORS.SUCCESS}15`,
-              borderRadius: 12,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              cursor: 'pointer',
-              border: `1px solid ${APP_COLORS.SUCCESS}40`
-            }}
+            className="p-3 bg-success/10 rounded-xl flex justify-between items-center cursor-pointer border border-success/40"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: APP_COLORS.SUCCESS, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 12 }}>
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-full bg-success flex items-center justify-center text-white text-xs">
                 🏢
               </div>
-              <span style={{ fontWeight: 600, color: APP_COLORS.SUCCESS }}>{getBusinessName(selectedBusiness)}</span>
+              <span className="font-semibold text-success">{getBusinessName(selectedBusiness)}</span>
             </div>
-            <ChevronDown size={18} color={APP_COLORS.SUCCESS} />
+            <ChevronDown size={18} className="text-success" />
           </div>
           
           <AnimatePresence>
@@ -149,20 +99,7 @@ export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode =
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  right: 0,
-                  backgroundColor: APP_COLORS.SURFACE,
-                  borderRadius: 12,
-                  marginTop: 8,
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  zIndex: 20,
-                  maxHeight: 200,
-                  overflowY: 'auto',
-                  border: `1px solid ${APP_COLORS.BORDER}`
-                }}
+                className="absolute top-full left-0 right-0 bg-surface rounded-xl mt-2 shadow-lg z-20 max-h-[200px] overflow-y-auto border border-border"
               >
                 {MOCK_BUSINESSES.map(b => (
                   <div 
@@ -171,13 +108,7 @@ export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode =
                       setSelectedBusiness(b);
                       setShowBusinessDropdown(false);
                     }}
-                    style={{
-                      padding: '12px 16px',
-                      borderBottom: `1px solid ${APP_COLORS.BORDER}`,
-                      cursor: 'pointer',
-                      fontSize: 14,
-                      color: APP_COLORS.TEXT_PRIMARY
-                    }}
+                    className="p-3 border-b border-border cursor-pointer text-sm text-text-primary last:border-b-0"
                   >
                     {getBusinessName(b)}
                   </div>
@@ -188,127 +119,97 @@ export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode =
         </div>
 
         {/* Media Type Selector */}
-        <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 5 }} className="no-scrollbar">
+        <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar">
           {mediaTypes.map(type => (
             <button
               key={type.id}
               onClick={() => setMediaType(type.id)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '10px 16px',
-                borderRadius: 25,
-                border: 'none',
-                backgroundColor: mediaType === type.id ? APP_COLORS.PRIMARY : APP_COLORS.SURFACE,
-                color: mediaType === type.id ? 'white' : APP_COLORS.TEXT_PRIMARY,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                boxShadow: APP_COLORS.SHADOW,
-                transition: 'all 0.2s'
-              }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full border-none cursor-pointer whitespace-nowrap shadow-sm transition-all duration-200 ${
+                mediaType === type.id ? 'bg-primary text-white' : 'bg-surface text-text-primary'
+              }`}
             >
               {type.icon}
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{type.label}</span>
+              <span className="text-[13px] font-semibold">{type.label}</span>
             </button>
           ))}
         </div>
 
         {/* Media Preview Area */}
-        <div style={{
-          width: '100%',
-          aspectRatio: mediaType === 'reel' ? '9/16' : '4/3',
-          backgroundColor: '#000',
-          borderRadius: 16,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'rgba(255,255,255,0.5)',
-          position: 'relative',
-          overflow: 'hidden',
-          maxHeight: mediaType === 'reel' ? 400 : 'auto'
-        }}>
+        <div 
+          className="w-full bg-black rounded-2xl flex flex-col items-center justify-center text-white/50 relative overflow-hidden"
+          style={{
+            aspectRatio: mediaType === 'reel' ? '9/16' : '4/3',
+            maxHeight: mediaType === 'reel' ? 400 : 'auto'
+          }}
+        >
           {mediaType === 'text' ? (
-            <div style={{ padding: 40, textAlign: 'center' }}>
-              <Type size={48} style={{ marginBottom: 15 }} />
-              <p style={{ fontSize: 14 }}>{t('writeText')}</p>
+            <div className="p-10 text-center">
+              <Type size={48} className="mb-4 mx-auto" />
+              <p className="text-sm">{t('writeText')}</p>
             </div>
           ) : (
             <>
               <img 
                 src={`https://picsum.photos/seed/${mediaType}/800/1200`} 
                 alt="Preview" 
-                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }} 
+                className="w-full h-full object-cover opacity-70"
               />
-              <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              <div className="absolute flex flex-col items-center gap-2.5">
                 {mediaType === 'photo' && <Camera size={48} />}
                 {mediaType === 'video' && <Video size={48} />}
                 {mediaType === 'reel' && <Film size={48} />}
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>{t('tapToChangeMedia')}</p>
+                <p className="text-sm font-semibold text-white">{t('tapToChangeMedia')}</p>
               </div>
             </>
           )}
         </div>
 
         {/* Caption */}
-        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-          <div style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: APP_COLORS.PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+        <div className="flex gap-3 items-start">
+          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
             ✍️
           </div>
           <textarea
             placeholder={t('writeCaption')}
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
+            className="flex-1 min-h-[100px] bg-transparent border-none outline-none text-base text-text-primary resize-none"
             style={{
-              flex: 1,
-              minHeight: 100,
-              backgroundColor: 'transparent',
-              border: 'none',
-              outline: 'none',
-              fontSize: 16,
-              color: APP_COLORS.TEXT_PRIMARY,
-              resize: 'none',
               fontFamily: isRTL ? "'Noto Naskh Arabic', sans-serif" : "'Inter', sans-serif",
               direction: isRTL ? 'rtl' : 'ltr'
             }}
           />
         </div>
 
-        <div style={{ height: 1, backgroundColor: APP_COLORS.BORDER }} />
+        <div className="h-px bg-border" />
 
         {/* Tags */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Tag size={20} color={APP_COLORS.TEXT_SECONDARY} />
+        <div className="flex items-center gap-3">
+          <Tag size={20} className="text-text-secondary shrink-0" />
           <input 
             type="text"
             placeholder={t('addTags')}
             value={tags}
             onChange={(e) => setTags(e.target.value)}
+            className="flex-1 bg-transparent border-none outline-none text-sm text-text-primary"
             style={{
-              flex: 1,
-              backgroundColor: 'transparent',
-              border: 'none',
-              outline: 'none',
-              fontSize: 14,
-              color: APP_COLORS.TEXT_PRIMARY,
               fontFamily: isRTL ? "'Noto Naskh Arabic', sans-serif" : "'Inter', sans-serif"
             }}
           />
         </div>
 
         {/* Location */}
-        <div style={{ position: 'relative' }}>
+        <div className="relative">
           <div 
             onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-            style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
+            className="flex items-center gap-3 cursor-pointer"
           >
-            <MapPin size={20} color={APP_COLORS.TEXT_SECONDARY} />
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 14, color: APP_COLORS.TEXT_PRIMARY }}>
+            <MapPin size={20} className="text-text-secondary shrink-0" />
+            <div className="flex-1 flex justify-between items-center">
+              <span className="text-sm text-text-primary">
                 {t('location')}: {getGovName(location)}
               </span>
-              <ChevronDown size={16} color={APP_COLORS.TEXT_SECONDARY} />
+              <ChevronDown size={16} className="text-text-secondary" />
             </div>
           </div>
           
@@ -318,20 +219,7 @@ export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode =
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  right: 0,
-                  backgroundColor: APP_COLORS.SURFACE,
-                  borderRadius: 12,
-                  marginTop: 8,
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  zIndex: 20,
-                  maxHeight: 200,
-                  overflowY: 'auto',
-                  border: `1px solid ${APP_COLORS.BORDER}`
-                }}
+                className="absolute top-full left-0 right-0 bg-surface rounded-xl mt-2 shadow-lg z-20 max-h-[200px] overflow-y-auto border border-border"
               >
                 {GOVERNORATES.map(g => (
                   <div 
@@ -340,13 +228,7 @@ export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode =
                       setLocation(g.id);
                       setShowLocationDropdown(false);
                     }}
-                    style={{
-                      padding: '12px 16px',
-                      borderBottom: `1px solid ${APP_COLORS.BORDER}`,
-                      cursor: 'pointer',
-                      fontSize: 14,
-                      color: APP_COLORS.TEXT_PRIMARY
-                    }}
+                    className="p-3 border-b border-border cursor-pointer text-sm text-text-primary last:border-b-0"
                   >
                     {getGovName(g.id)}
                   </div>
@@ -357,40 +239,14 @@ export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode =
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: 15, marginTop: 10 }}>
-          <button style={{
-            flex: 1,
-            padding: '15px',
-            borderRadius: 12,
-            border: `1px solid ${APP_COLORS.BORDER}`,
-            backgroundColor: APP_COLORS.SURFACE,
-            color: APP_COLORS.TEXT_PRIMARY,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}>
+        <div className="flex gap-4 mt-2.5">
+          <button className="flex-1 p-4 rounded-xl border border-border bg-surface text-text-primary flex items-center justify-center gap-2 font-semibold cursor-pointer">
             <Eye size={20} />
             {t('preview')}
           </button>
           <button 
             onClick={handleShare}
-            style={{
-              flex: 2,
-              padding: '15px',
-              borderRadius: 12,
-              border: 'none',
-              backgroundColor: APP_COLORS.PRIMARY,
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              fontWeight: 600,
-              cursor: 'pointer'
-            }}
+            className="flex-[2] p-4 rounded-xl border-none bg-primary text-white flex items-center justify-center gap-2 font-semibold cursor-pointer"
           >
             {t('shareNow')}
           </button>
@@ -404,24 +260,10 @@ export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode =
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            style={{
-              position: 'fixed',
-              bottom: 40,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              backgroundColor: APP_COLORS.TEXT_PRIMARY,
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: 30,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              zIndex: 2000,
-              boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
-            }}
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-text-primary text-white px-6 py-3 rounded-full flex items-center gap-2.5 z-[2000] shadow-xl"
           >
-            <CheckCircle2 size={20} color={APP_COLORS.SUCCESS} />
-            <span style={{ fontWeight: 600 }}>{t('postShared')} ✓</span>
+            <CheckCircle2 size={20} className="text-success" />
+            <span className="font-semibold">{t('postShared')} ✓</span>
           </motion.div>
         )}
       </AnimatePresence>

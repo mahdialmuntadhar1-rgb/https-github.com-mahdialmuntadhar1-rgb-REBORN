@@ -15,26 +15,17 @@ interface Props {
 
 export default function CitySelectScreen({ pop, selectedCity, setSelectedCity, lang, t, isRTL }: Props) {
   return (
-    <div style={{ backgroundColor: APP_COLORS.BACKGROUND, minHeight: '100%' }}>
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <div style={{
-        padding: '40px 20px 15px',
-        backgroundColor: APP_COLORS.SURFACE,
-        borderBottom: `1px solid ${APP_COLORS.BORDER}`,
-        display: 'flex',
-        alignItems: 'center',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
-      }}>
-        <div onClick={pop} style={{ cursor: 'pointer', marginLeft: isRTL ? 0 : 15, marginRight: isRTL ? 15 : 0 }}>
-          <ChevronRight size={24} color={APP_COLORS.TEXT_PRIMARY} style={{ transform: isRTL ? 'none' : 'rotate(180deg)' }} />
+      <div className="pt-10 pb-4 px-5 bg-surface border-b border-border flex items-center sticky top-0 z-10">
+        <div onClick={pop} className={`cursor-pointer ${isRTL ? 'ml-0 mr-4' : 'ml-4 mr-0'}`}>
+          <ChevronRight size={24} className={`text-text-primary ${isRTL ? '' : 'rotate-180'}`} />
         </div>
-        <h2 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t('selectCity')}</h2>
+        <h2 className="m-0 text-lg font-bold">{t('selectCity')}</h2>
       </div>
 
-      <div style={{ padding: 20 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="p-5">
+        <div className="flex flex-col gap-3">
           {GOVERNORATES.map(city => {
             const isSelected = city.id === selectedCity;
             const name = city[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Governorate] as string;
@@ -45,25 +36,15 @@ export default function CitySelectScreen({ pop, selectedCity, setSelectedCity, l
                   setSelectedCity(city.id);
                   pop();
                 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  backgroundColor: APP_COLORS.SURFACE,
-                  padding: '16px 20px',
-                  borderRadius: 16,
-                  boxShadow: APP_COLORS.SHADOW,
-                  cursor: 'pointer',
-                  border: isSelected ? `2px solid ${APP_COLORS.PRIMARY}` : '2px solid transparent'
-                }}
+                className={`flex items-center justify-between bg-surface px-5 py-4 rounded-2xl shadow-sm cursor-pointer border-2 ${isSelected ? 'border-primary' : 'border-transparent'}`}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <MapPin size={20} color={isSelected ? APP_COLORS.PRIMARY : APP_COLORS.TEXT_SECONDARY} />
-                  <span style={{ ...TYPOGRAPHY.headline, fontSize: 16, color: isSelected ? APP_COLORS.PRIMARY : APP_COLORS.TEXT_PRIMARY }}>
+                <div className="flex items-center gap-3">
+                  <MapPin size={20} className={isSelected ? 'text-primary' : 'text-text-secondary'} />
+                  <span className={`text-base font-bold ${isSelected ? 'text-primary' : 'text-text-primary'}`}>
                     {name}
                   </span>
                 </div>
-                {isSelected && <Check size={20} color={APP_COLORS.PRIMARY} />}
+                {isSelected && <Check size={20} className="text-primary" />}
               </div>
             );
           })}

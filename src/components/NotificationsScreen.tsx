@@ -33,12 +33,12 @@ export default function NotificationsScreen({ pop, push, t, isRTL }: Props) {
 
   const getIcon = (type: Notification['type']) => {
     switch (type) {
-      case 'like': return <div style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#FF3B30' }} />; // Red dot as requested [🔴]
-      case 'comment': return <MessageCircle size={18} color={APP_COLORS.TEXT_SECONDARY} />; // [💬]
-      case 'review': return <Star size={18} color={APP_COLORS.PREMIUM_GOLD} fill={APP_COLORS.PREMIUM_GOLD} />; // [⭐]
-      case 'offer': return <Bell size={18} color={APP_COLORS.SECONDARY} />; // [🔔]
-      case 'checkin': return <Heart size={18} color={APP_COLORS.PRIMARY} fill={APP_COLORS.PRIMARY} />; // [❤️]
-      default: return <Bell size={18} color={APP_COLORS.TEXT_SECONDARY} />;
+      case 'like': return <div className="w-3 h-3 rounded-full bg-[#FF3B30]" />; // Red dot as requested [🔴]
+      case 'comment': return <MessageCircle size={18} className="text-text-secondary" />; // [💬]
+      case 'review': return <Star size={18} className="text-premium-gold fill-premium-gold" />; // [⭐]
+      case 'offer': return <Bell size={18} className="text-secondary" />; // [🔔]
+      case 'checkin': return <Heart size={18} className="text-primary fill-primary" />; // [❤️]
+      default: return <Bell size={18} className="text-text-secondary" />;
     }
   };
 
@@ -47,16 +47,16 @@ export default function NotificationsScreen({ pop, push, t, isRTL }: Props) {
     if (sectionNotifs.length === 0) return null;
 
     return (
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '0 20px' }}>
-          <span style={{ ...TYPOGRAPHY.headline, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY, whiteSpace: 'nowrap' }}>{title}</span>
-          <div style={{ flex: 1, height: 1, backgroundColor: APP_COLORS.BORDER }} />
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-4 px-5">
+          <span className="text-sm font-bold text-text-secondary whitespace-nowrap">{title}</span>
+          <div className="flex-1 h-px bg-border" />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div className="flex flex-col gap-0.5">
           {sectionNotifs.map(notif => (
             <motion.div 
               key={notif.id}
-              whileTap={{ backgroundColor: APP_COLORS.BORDER }}
+              whileTap={{ backgroundColor: 'var(--color-border)' }}
               onClick={() => {
                 // Navigate to relevant screen based on type
                 if (notif.type === 'like' || notif.type === 'comment') {
@@ -65,26 +65,21 @@ export default function NotificationsScreen({ pop, push, t, isRTL }: Props) {
                   push('BusinessDetail', { businessId: 'b1' }); // Mocking b1
                 }
               }}
-              style={{
-                backgroundColor: notif.read ? APP_COLORS.SURFACE : `${APP_COLORS.PRIMARY}08`, // Unread: slightly highlighted background
-                padding: '16px 20px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 16,
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-                borderBottom: `1px solid ${APP_COLORS.BORDER}40`
-              }}
+              className={`px-5 py-4 flex items-center gap-4 cursor-pointer transition-colors border-b border-border/40 ${
+                notif.read ? 'bg-surface' : 'bg-primary/5'
+              }`}
             >
-              <div style={{ width: 24, display: 'flex', justifyContent: 'center' }}>
+              <div className="w-6 flex justify-center">
                 {getIcon(notif.type)}
               </div>
-              <div style={{ flex: 1, textAlign: isRTL ? 'right' : 'left' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                  <p style={{ ...TYPOGRAPHY.body, margin: 0, fontSize: 14, color: APP_COLORS.TEXT_PRIMARY }}>
-                    <span style={{ fontWeight: 600 }}>{notif.title}</span> {notif.message}
+              <div className={`flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <div className="flex justify-between items-baseline">
+                  <p className="m-0 text-sm text-text-primary">
+                    <span className="font-semibold">{notif.title}</span> {notif.message}
                   </p>
-                  <span style={{ fontSize: 12, color: APP_COLORS.TEXT_MUTED, whiteSpace: 'nowrap', marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }}>{notif.timestamp}</span>
+                  <span className={`text-xs text-text-muted whitespace-nowrap ${isRTL ? 'mr-2' : 'ml-2'}`}>
+                    {notif.timestamp}
+                  </span>
                 </div>
               </div>
             </motion.div>
@@ -95,105 +90,51 @@ export default function NotificationsScreen({ pop, push, t, isRTL }: Props) {
   };
 
   return (
-    <div style={{ backgroundColor: APP_COLORS.BACKGROUND, minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
-      <style>
-        {`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}
-      </style>
-
+    <div className="bg-background min-h-screen flex flex-col">
       {/* Header */}
-      <div style={{
-        padding: '20px',
-        backgroundColor: APP_COLORS.SURFACE,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: `1px solid ${APP_COLORS.BORDER}`,
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="p-5 bg-surface flex justify-between items-center border-b border-border sticky top-0 z-10">
+        <div className="flex items-center gap-3">
           {isRTL ? (
-            <ArrowRight size={24} color={APP_COLORS.TEXT_PRIMARY} onClick={pop} style={{ cursor: 'pointer' }} />
+            <ArrowRight size={24} className="text-text-primary cursor-pointer" onClick={pop} />
           ) : (
-            <ArrowLeft size={24} color={APP_COLORS.TEXT_PRIMARY} onClick={pop} style={{ cursor: 'pointer' }} />
+            <ArrowLeft size={24} className="text-text-primary cursor-pointer" onClick={pop} />
           )}
-          <h1 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t('notifications')}</h1>
+          <h1 className="m-0 text-lg font-bold">{t('notifications')}</h1>
         </div>
         <button 
           onClick={markAllRead}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 6, 
-            background: 'none', 
-            border: 'none', 
-            color: APP_COLORS.PRIMARY,
-            cursor: 'pointer',
-            fontSize: 14,
-            fontWeight: 600
-          }}
+          className="flex items-center gap-1.5 bg-transparent border-none text-primary cursor-pointer text-sm font-semibold"
         >
           <CheckCircle size={18} />
           {t('markAllRead')}
         </button>
       </div>
 
-      <div style={{ padding: '20px 0', flex: 1, overflowY: 'auto' }}>
+      <div className="py-5 flex-1 overflow-y-auto">
         {renderSection(isRTL ? 'اليوم' : 'Today', 'today')}
         {renderSection(isRTL ? 'أمس' : 'Yesterday', 'yesterday')}
 
         {notifications.length === 0 && (
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            padding: '100px 20px',
-            textAlign: 'center'
-          }}>
-            <Bell size={64} color={APP_COLORS.TEXT_MUTED} strokeWidth={1} style={{ marginBottom: 16 }} />
-            <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 18, marginBottom: 8, color: APP_COLORS.TEXT_PRIMARY }}>
+          <div className="flex flex-col items-center justify-center py-24 px-5 text-center">
+            <Bell size={64} className="text-text-muted mb-4" strokeWidth={1} />
+            <h3 className="text-lg font-bold mb-2 text-text-primary">
               {isRTL ? 'لا توجد إشعارات' : 'No notifications yet'}
             </h3>
-            <p style={{ ...TYPOGRAPHY.body, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY }}>
+            <p className="text-sm text-text-secondary">
               {isRTL ? 'سنخطرك عند حدوث شيء جديد.' : "We'll notify you when something new happens."}
             </p>
           </div>
         )}
 
         {hasMore && (
-          <div style={{ padding: '0 20px', marginTop: 10 }}>
+          <div className="px-5 mt-2.5">
             <button 
               onClick={handleLoadMore}
               disabled={isLoadingMore}
-              style={{
-                width: '100%',
-                padding: 12,
-                backgroundColor: APP_COLORS.SURFACE,
-                border: `1px solid ${APP_COLORS.BORDER}`,
-                borderRadius: 12,
-                color: APP_COLORS.PRIMARY,
-                ...TYPOGRAPHY.headline,
-                fontSize: 14,
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
+              className="w-full p-3 bg-surface border border-border rounded-xl text-primary text-sm font-bold cursor-pointer flex justify-center items-center"
             >
               {isLoadingMore ? (
-                <div style={{
-                  width: 18, height: 18, 
-                  border: `2px solid ${APP_COLORS.PRIMARY}`, 
-                  borderTopColor: 'transparent', 
-                  borderRadius: '50%', 
-                  animation: 'spin 1s linear infinite'
-                }} />
+                <div className="w-4.5 h-4.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               ) : `${t('loadMore')} ↓`}
             </button>
           </div>

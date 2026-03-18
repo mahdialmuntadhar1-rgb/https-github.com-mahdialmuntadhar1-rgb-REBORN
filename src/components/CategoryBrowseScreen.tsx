@@ -43,23 +43,23 @@ export default function CategoryBrowseScreen({ push, pop, categoryId = 'all' }: 
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0a0a0f] text-white">
+    <div className="flex flex-col min-h-screen bg-background text-text-primary">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-[#0a0a0f]/80 backdrop-blur-md border-b border-white/5 p-6 flex items-center justify-between">
+      <div className="sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-border p-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={pop} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+          <button onClick={pop} className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-text-muted hover:text-text-primary transition-colors border border-border">
             {isRTL ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
           <div className="flex flex-col">
             <h1 className="text-lg font-bold">
               {activeCategory ? t(activeCategory.nameKey) : (isRTL ? 'تصفح الكل' : 'Browse All')}
             </h1>
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">
+            <span className="text-[10px] text-text-muted uppercase tracking-widest font-bold">
               {GOVERNORATES.find(g => g.id === selectedGovernorate)?.[language === 'ar' ? 'nameAr' : language === 'ku' ? 'nameKu' : 'nameEn']}
             </span>
           </div>
         </div>
-        <button className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+        <button className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-text-muted hover:text-text-primary transition-colors border border-border">
           <SlidersHorizontal size={20} />
         </button>
       </div>
@@ -67,13 +67,13 @@ export default function CategoryBrowseScreen({ push, pop, categoryId = 'all' }: 
       {/* Search & Categories */}
       <div className="p-6 flex flex-col gap-4">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={18} />
+          <Search className="absolute inset-inline-start-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
           <input 
             type="text"
             placeholder={t('madinaty_search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-12 bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+            className="w-full h-12 bg-surface border border-border rounded-2xl ps-12 pe-4 text-sm text-text-primary focus:outline-none focus:border-primary/50 transition-colors placeholder:text-text-muted"
           />
         </div>
 
@@ -85,7 +85,7 @@ export default function CategoryBrowseScreen({ push, pop, categoryId = 'all' }: 
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border transition-all ${
                 selectedCategory === cat.id 
                   ? 'bg-primary border-primary text-white' 
-                  : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                  : 'bg-surface border-border text-text-secondary hover:bg-background'
               }`}
             >
               <span>{cat.icon}</span>
@@ -113,7 +113,7 @@ export default function CategoryBrowseScreen({ push, pop, categoryId = 'all' }: 
                 <button 
                   onClick={loadMore}
                   disabled={isLoading}
-                  className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-primary font-bold text-sm hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-2xl bg-surface border border-border text-primary font-bold text-sm hover:bg-background transition-colors flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
                     <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -129,10 +129,10 @@ export default function CategoryBrowseScreen({ push, pop, categoryId = 'all' }: 
           </div>
         ) : (
           <div className="py-20 flex flex-col items-center justify-center text-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-white/20">
+            <div className="w-16 h-16 rounded-full bg-surface border border-border flex items-center justify-center text-text-muted">
               <Store size={32} />
             </div>
-            <p className="text-sm text-white/40 leading-relaxed px-10">
+            <p className="text-sm text-text-muted leading-relaxed px-10">
               {t('madinaty_no_businesses')}
             </p>
           </div>

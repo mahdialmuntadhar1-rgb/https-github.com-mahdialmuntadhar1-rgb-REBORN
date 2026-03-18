@@ -44,11 +44,8 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState<Screen>('Home');
   
   // Auth Flow State
-  const [authStep, setAuthStep] = useState<AuthStep>(() => {
-    const onboardingDone = localStorage.getItem('onboarding_done') === 'true';
-    if (!onboardingDone) return 'onboarding';
-    return 'auth';
-  });
+  const [authStep, setAuthStep] = useState<AuthStep>('completed');
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [tempPhone, setTempPhone] = useState('');
   const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
 
@@ -56,26 +53,42 @@ function AppContent() {
     if (isAuthenticated) {
       if (!currentUser?.displayName) {
         setAuthStep('profile_setup');
+        setShowAuthModal(true);
       } else if (!currentUser?.role) {
         setAuthStep('user_type');
+        setShowAuthModal(true);
       } else if (currentUser?.role === 'business_owner' && authStep !== 'completed') {
         setAuthStep('business_claim');
+        setShowAuthModal(true);
       } else {
         setAuthStep('completed');
+        setShowAuthModal(false);
       }
     } else {
-      const onboardingDone = localStorage.getItem('onboarding_done') === 'true';
-      if (!onboardingDone) {
-        setAuthStep('onboarding');
-      } else {
-        setAuthStep('auth');
-      }
+      setAuthStep('auth');
     }
-  }, [isAuthenticated, currentUser, authStep]);
+  }, [isAuthenticated, currentUser]);
+
+  const requireAuth = (callback: () => void) => {
+    if (isAuthenticated) {
+      callback();
+    } else {
+      setAuthStep('auth');
+      setShowAuthModal(true);
+    }
+  };
 
   const push = (screen: Screen, props?: Record<string, any>) => {
-    setDirection(1);
-    setNavStack([...navStack, { screen, props }]);
+    const protectedScreens = ['AddPost', 'Notifications', 'Profile', 'BusinessDashboard', 'AddBusinessPost', 'ClaimBusiness'];
+    if (protectedScreens.includes(screen)) {
+      requireAuth(() => {
+        setDirection(1);
+        setNavStack([...navStack, { screen, props }]);
+      });
+    } else {
+      setDirection(1);
+      setNavStack([...navStack, { screen, props }]);
+    }
   };
 
   const pop = () => {
@@ -86,8 +99,8 @@ function AppContent() {
   };
 
   const currentFrame = navStack[navStack.length - 1];
-  const showTopBar = authStep === 'completed' && !['StoryViewer'].includes(currentFrame.screen);
-  const showBottomNav = authStep === 'completed' && !['StoryViewer', 'AddPost', 'BusinessDetail', 'PostDetail', 'Search', 'CategoryBrowse', 'AddBusinessPost', 'ClaimBusiness'].includes(currentFrame.screen);
+  const showTopBar = !['StoryViewer'].includes(currentFrame.screen);
+  const showBottomNav = !['StoryViewer', 'AddPost', 'BusinessDetail', 'PostDetail', 'Search', 'CategoryBrowse', 'AddBusinessPost', 'ClaimBusiness'].includes(currentFrame.screen);
 
   const renderScreen = () => {
     const screenProps = { push, pop, lang: language, t, isRTL };
@@ -139,11 +152,8 @@ function AppContent() {
   const promptForwardX = isRTL ? (direction * 390) : (direction * -390);
 
   return (
-    <div className="flex items-center justify-center w-screen h-screen bg-[#f0f0f0] overflow-hidden">
-      <div className="relative flex flex-col w-[390px] h-[844px] bg-[#0a0a0f] rounded-[44px] shadow-2xl overflow-hidden border-[8px] border-[#1a1a1a] text-white" style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
-        {/* Notch */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150px] h-[30px] bg-[#1a1a1a] rounded-b-[20px] z-[1000]" />
-
+    <div className="w-full min-h-screen bg-background text-text-primary overflow-hidden flex justify-center" style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
+      <div className="relative flex flex-col w-full max-w-[500px] min-h-screen bg-background shadow-2xl overflow-hidden">
         {showTopBar && (
           <TopBar 
             title={currentFrame.screen === 'Home' ? undefined : t(`screen_${currentFrame.screen.toLowerCase()}`)}
@@ -156,122 +166,100 @@ function AppContent() {
           />
         )}
 
-        {/* Auth Flow vs Main App */}
+        {/* Main App Content */}
         <div className="relative flex-1 overflow-y-auto no-scrollbar" style={{ 
           paddingTop: showTopBar ? 64 : 0,
           paddingBottom: showBottomNav ? 80 : 0,
         }}>
           <AnimatePresence mode="wait" initial={false} custom={direction}>
-            {authStep === 'onboarding' && (
-              <motion.div
-                key="onboarding"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0"
-              >
-                <OnboardingCarousel onComplete={() => { setDirection(1); setAuthStep('auth'); }} />
-              </motion.div>
-            )}
-
-            {authStep === 'auth' && (
-              <motion.div
-                key="auth"
-                initial={{ x: promptForwardX, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -promptForwardX, opacity: 0 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="absolute inset-0"
-              >
-                <AuthScreen 
-                  onPhoneSubmit={(phone) => { 
-                    setTempPhone(phone); 
-                    setDirection(1);
-                    setAuthStep('otp'); 
-                  }}
-                  onSuccess={() => setDirection(1)} 
-                />
-              </motion.div>
-            )}
-
-            {authStep === 'otp' && (
-              <motion.div
-                key="otp"
-                initial={{ x: promptForwardX, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -promptForwardX, opacity: 0 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="absolute inset-0"
-              >
-                <OTPScreen 
-                  phoneNumber={tempPhone}
-                  onBack={() => { setDirection(-1); setAuthStep('auth'); }}
-                  onSuccess={() => setDirection(1)}
-                />
-              </motion.div>
-            )}
-
-            {authStep === 'profile_setup' && (
-              <motion.div
-                key="profile_setup"
-                initial={{ x: promptForwardX, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -promptForwardX, opacity: 0 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="absolute inset-0"
-              >
-                <ProfileSetupScreen onSuccess={() => setDirection(1)} />
-              </motion.div>
-            )}
-
-            {authStep === 'user_type' && (
-              <motion.div
-                key="user_type"
-                initial={{ x: promptForwardX, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -promptForwardX, opacity: 0 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="absolute inset-0"
-              >
-                <UserTypeScreen onSuccess={() => setDirection(1)} />
-              </motion.div>
-            )}
-
-            {authStep === 'business_claim' && (
-              <motion.div
-                key="business_claim"
-                initial={{ x: promptForwardX, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -promptForwardX, opacity: 0 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="absolute inset-0"
-              >
-                <BusinessClaimScreen onComplete={() => { setDirection(1); setAuthStep('completed'); }} />
-              </motion.div>
-            )}
-
-            {authStep === 'completed' && (
-              <motion.div
-                key={currentFrame.screen + (currentFrame.props?.id || '')}
-                initial={{ x: promptForwardX, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -promptForwardX, opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="w-full h-full"
-              >
-                {renderScreen()}
-              </motion.div>
-            )}
+            <motion.div
+              key={currentFrame.screen + (currentFrame.props?.id || '')}
+              initial={{ x: promptForwardX, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -promptForwardX, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="w-full h-full"
+            >
+              {renderScreen()}
+            </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* Auth Modal Overlay */}
+        <AnimatePresence>
+          {showAuthModal && (
+            <motion.div
+              initial={{ opacity: 0, y: '100%' }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="absolute inset-0 z-[2000] bg-background"
+            >
+              {authStep === 'onboarding' && (
+                <OnboardingCarousel onComplete={() => {
+                  localStorage.setItem('onboarding_done', 'true');
+                  setAuthStep('auth');
+                }} />
+              )}
+
+              {authStep === 'auth' && (
+                <AuthScreen 
+                  onPhoneSubmit={(phone) => {
+                    setTempPhone(phone);
+                    setAuthStep('otp');
+                  }}
+                  onSuccess={() => setShowAuthModal(false)}
+                />
+              )}
+
+              {authStep === 'otp' && (
+                <OTPScreen 
+                  phoneNumber={tempPhone}
+                  onBack={() => setAuthStep('auth')}
+                  onSuccess={() => {}}
+                />
+              )}
+
+              {authStep === 'profile_setup' && (
+                <ProfileSetupScreen onSuccess={() => {}} />
+              )}
+
+              {authStep === 'user_type' && (
+                <UserTypeScreen onSuccess={() => {}} />
+              )}
+
+              {authStep === 'business_claim' && (
+                <BusinessClaimScreen onComplete={() => { setAuthStep('completed'); setShowAuthModal(false); }} />
+              )}
+              
+              {/* Close button for modal */}
+              {authStep === 'auth' && (
+                <button 
+                  onClick={() => setShowAuthModal(false)}
+                  className="absolute top-12 end-6 w-10 h-10 bg-black/10 rounded-full flex items-center justify-center text-text-primary z-[2001]"
+                >
+                  ✕
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Bottom Navigation */}
         {showBottomNav && (
           <BottomNav 
             activeTab={activeTab} 
             onTabChange={(tab) => {
-              setActiveTab(tab);
-              setNavStack([{ screen: tab }]);
+              const protectedTabs = ['AddPost', 'Notifications', 'Profile', 'BusinessDashboard'];
+              if (protectedTabs.includes(tab)) {
+                requireAuth(() => {
+                  setActiveTab(tab);
+                  setNavStack([{ screen: tab }]);
+                });
+              } else {
+                setActiveTab(tab);
+                setNavStack([{ screen: tab }]);
+              }
             }}
             unreadCount={2}
           />

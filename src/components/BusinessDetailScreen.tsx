@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Screen, Business, Governorate } from '../types';
-import { APP_COLORS, TYPOGRAPHY, CATEGORIES, GOVERNORATES } from '../constants';
+import { CATEGORIES, GOVERNORATES } from '../constants';
 import { ChevronRight, ChevronLeft, Star, MapPin, Phone, Clock, Share2, Heart, MessageCircle, Navigation, Globe, Tag } from 'lucide-react';
 
 interface Props {
@@ -26,14 +26,7 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
   if (!business) return (
     <div 
       onClick={pop} 
-      style={{ 
-        height: '100%', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        backgroundColor: APP_COLORS.BACKGROUND,
-        color: APP_COLORS.TEXT_PRIMARY
-      }}
+      className="h-full flex items-center justify-center bg-background text-text-primary cursor-pointer"
     >
       {t.noData}
     </div>
@@ -62,13 +55,12 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
 
   const renderStars = (rating: number) => {
     return (
-      <div style={{ display: 'flex', gap: 2 }}>
+      <div className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map(star => (
           <Star 
             key={star} 
             size={14} 
-            fill={star <= rating ? APP_COLORS.PREMIUM_GOLD : 'transparent'} 
-            color={star <= rating ? APP_COLORS.PREMIUM_GOLD : APP_COLORS.BORDER} 
+            className={star <= rating ? "fill-amber-500 text-amber-500" : "fill-transparent text-border"} 
           />
         ))}
       </div>
@@ -83,166 +75,78 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
       animate={{ x: 0 }}
       exit={{ x: isRTL ? '-100%' : '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      style={{ 
-        backgroundColor: APP_COLORS.BACKGROUND, 
-        minHeight: '100%', 
-        display: 'flex', 
-        flexDirection: 'column',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 100,
-        overflowY: 'auto',
-        direction: isRTL ? 'rtl' : 'ltr'
-      }}
+      className="absolute inset-0 z-[100] flex flex-col bg-background overflow-y-auto"
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Header Image */}
-      <div style={{ position: 'relative', height: 240, flexShrink: 0 }}>
+      <div className="relative h-60 shrink-0">
         <img 
           src={business.coverUrl} 
           alt={name} 
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+          className="w-full h-full object-cover" 
         />
         
         {/* Top Bar */}
-        <div style={{
-          position: 'absolute',
-          top: 40,
-          left: 20,
-          right: 20,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          zIndex: 10
-        }}>
+        <div className="absolute top-10 left-5 right-5 flex justify-between items-center z-10">
           <motion.div 
             whileTap={{ scale: 0.9 }}
             onClick={pop}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: 'rgba(255,255,255,0.8)',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              cursor: 'pointer',
-              backdropFilter: 'blur(10px)'
-            }}
+            className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex justify-center items-center cursor-pointer"
           >
-            {isRTL ? <ChevronRight size={24} color={APP_COLORS.TEXT_PRIMARY} /> : <ChevronLeft size={24} color={APP_COLORS.TEXT_PRIMARY} />}
+            {isRTL ? <ChevronRight size={24} className="text-text-primary" /> : <ChevronLeft size={24} className="text-text-primary" />}
           </motion.div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="flex gap-2.5">
             <motion.div 
               whileTap={{ scale: 1.3 }}
               onClick={() => setLiked(!liked)}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: 'rgba(255,255,255,0.8)',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                cursor: 'pointer',
-                backdropFilter: 'blur(10px)'
-              }}
+              className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex justify-center items-center cursor-pointer"
             >
               <Heart 
                 size={20} 
-                fill={liked ? APP_COLORS.LIVE_RED : 'transparent'} 
-                color={liked ? APP_COLORS.LIVE_RED : APP_COLORS.TEXT_PRIMARY} 
+                className={liked ? "fill-red-500 text-red-500" : "fill-transparent text-text-primary"} 
               />
             </motion.div>
             <motion.div 
               whileTap={{ scale: 0.9 }}
               onClick={handleShare}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: 'rgba(255,255,255,0.8)',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                cursor: 'pointer',
-                backdropFilter: 'blur(10px)'
-              }}
+              className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex justify-center items-center cursor-pointer"
             >
-              <Share2 size={20} color={APP_COLORS.TEXT_PRIMARY} />
+              <Share2 size={20} className="text-text-primary" />
             </motion.div>
           </div>
         </div>
 
         {business.isPremium && (
-          <div style={{
-            position: 'absolute',
-            bottom: 32,
-            [isRTL ? 'left' : 'right']: 20,
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            color: APP_COLORS.PREMIUM_GOLD,
-            padding: '6px 12px',
-            borderRadius: 12,
-            fontSize: 12,
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            backdropFilter: 'blur(4px)'
-          }}>
-            <Star size={12} fill={APP_COLORS.PREMIUM_GOLD} /> {t.premium}
+          <div className={`absolute bottom-8 ${isRTL ? 'left-5' : 'right-5'} bg-black/70 text-amber-500 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm`}>
+            <Star size={12} className="fill-amber-500" /> {t.premium}
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div style={{
-        backgroundColor: APP_COLORS.SURFACE,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        marginTop: -24,
-        position: 'relative',
-        padding: '24px 20px 0',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
-        <div style={{ marginBottom: 16, textAlign: isRTL ? 'right' : 'left' }}>
-          <h1 style={{ ...TYPOGRAPHY.headline, margin: '0 0 4px 0', fontSize: 24, color: APP_COLORS.TEXT_PRIMARY }}>
+      <div className="bg-surface rounded-t-3xl -mt-6 relative px-5 pt-6 flex-1 flex flex-col">
+        <div className={`mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <h1 className="font-bold text-2xl m-0 mb-1 text-text-primary">
             {name}
           </h1>
-          <p style={{ ...TYPOGRAPHY.body, margin: 0, color: APP_COLORS.TEXT_SECONDARY, fontSize: 16 }}>
+          <p className="m-0 text-text-secondary text-base">
             {govName}
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 8, 
-            color: APP_COLORS.TEXT_SECONDARY, 
-            fontSize: 14
-          }}>
-            <Star size={16} color={APP_COLORS.PREMIUM_GOLD} fill={APP_COLORS.PREMIUM_GOLD} />
-            <span style={{ fontWeight: 600, color: APP_COLORS.TEXT_PRIMARY }}>{business.rating || 4.8}</span>
+        <div className="flex flex-col gap-2 mb-5">
+          <div className="flex items-center gap-2 text-text-secondary text-sm">
+            <Star size={16} className="text-amber-500 fill-amber-500" />
+            <span className="font-semibold text-text-primary">{business.rating || 4.8}</span>
             <span>({business.reviewCount || 247} {t.reviewsCount})</span>
             <span>•</span>
             <MapPin size={14} />
             <span>{govName}</span>
           </div>
           
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 8, 
-            color: APP_COLORS.TEXT_SECONDARY, 
-            fontSize: 14
-          }}>
-            <Clock size={14} color={business.isOpen !== false ? APP_COLORS.SUCCESS : APP_COLORS.LIVE_RED} />
-            <span style={{ color: business.isOpen !== false ? APP_COLORS.SUCCESS : APP_COLORS.LIVE_RED, fontWeight: 600 }}>
+          <div className="flex items-center gap-2 text-text-secondary text-sm">
+            <Clock size={14} className={business.isOpen !== false ? "text-emerald-500" : "text-red-500"} />
+            <span className={`font-semibold ${business.isOpen !== false ? "text-emerald-500" : "text-red-500"}`}>
               {business.isOpen !== false ? t.openNow : t.closed}
             </span>
             {business.openHours && (
@@ -254,19 +158,14 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
             {business.priceRange && (
               <>
                 <span>•</span>
-                <span style={{ fontWeight: 600 }}>{business.priceRange}</span>
+                <span className="font-semibold">{business.priceRange}</span>
               </>
             )}
           </div>
         </div>
 
         {/* Inner Tabs */}
-        <div style={{ 
-          display: 'flex', 
-          borderBottom: `1px solid ${APP_COLORS.BORDER}`,
-          marginBottom: 20,
-          gap: 24
-        }}>
+        <div className="flex border-b border-border mb-5 gap-6">
           {[
             { id: 'about', label: t.about },
             { id: 'reviews', label: t.reviews },
@@ -276,14 +175,11 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
             <div 
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              style={{
-                paddingBottom: 12,
-                cursor: 'pointer',
-                color: activeTab === tab.id ? APP_COLORS.PRIMARY : APP_COLORS.TEXT_SECONDARY,
-                fontWeight: activeTab === tab.id ? 600 : 400,
-                borderBottom: `2px solid ${activeTab === tab.id ? APP_COLORS.PRIMARY : 'transparent'}`,
-                transition: 'all 0.2s'
-              }}
+              className={`pb-3 cursor-pointer transition-all border-b-2 ${
+                activeTab === tab.id 
+                  ? 'text-primary font-semibold border-primary' 
+                  : 'text-text-secondary font-normal border-transparent'
+              }`}
             >
               {tab.label}
             </div>
@@ -291,10 +187,10 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
         </div>
 
         {/* Tab Content */}
-        <div style={{ flex: 1, paddingBottom: 100 }}>
+        <div className="flex-1 pb-24">
           {activeTab === 'about' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-3">
                 <InfoRow 
                   icon={<Phone size={18} />} 
                   text={business.phone || '+964 770 111 2233'} 
@@ -312,18 +208,11 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
               </div>
               
               {business.tags && business.tags.length > 0 && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                  <div style={{ color: APP_COLORS.TEXT_SECONDARY, marginTop: 2 }}><Tag size={18} /></div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                <div className="flex items-start gap-3">
+                  <div className="text-text-secondary mt-0.5"><Tag size={18} /></div>
+                  <div className="flex flex-wrap gap-2">
                     {business.tags.map(tag => (
-                      <span key={tag} style={{ 
-                        backgroundColor: `${APP_COLORS.PRIMARY}15`, 
-                        color: APP_COLORS.PRIMARY, 
-                        padding: '4px 10px', 
-                        borderRadius: 12, 
-                        fontSize: 12,
-                        fontWeight: 500
-                      }}>
+                      <span key={tag} className="bg-primary/10 text-primary px-2.5 py-1 rounded-xl text-xs font-medium">
                         {tag}
                       </span>
                     ))}
@@ -331,9 +220,9 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
                 </div>
               )}
 
-              <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
-                <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 16, marginBottom: 8, color: APP_COLORS.TEXT_PRIMARY }}>{t.description}</h3>
-                <p style={{ ...TYPOGRAPHY.body, fontSize: 15, lineHeight: 1.6, color: APP_COLORS.TEXT_PRIMARY }}>
+              <div className={isRTL ? 'text-right' : 'text-left'}>
+                <h3 className="font-bold text-base mb-2 text-text-primary">{t.description}</h3>
+                <p className="text-[15px] leading-relaxed text-text-primary">
                   {description}
                 </p>
               </div>
@@ -341,23 +230,21 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
           )}
 
           {activeTab === 'reviews' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 36, fontWeight: 'bold', color: APP_COLORS.TEXT_PRIMARY }}>{business.rating || 4.8}</div>
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-5">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-text-primary">{business.rating || 4.8}</div>
                   {renderStars(Math.round(business.rating || 4.8))}
-                  <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY, marginTop: 4 }}>{business.reviewCount || 247} {t.reviewsCount}</div>
+                  <div className="text-xs text-text-secondary mt-1">{business.reviewCount || 247} {t.reviewsCount}</div>
                 </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div className="flex-1 flex flex-col gap-1">
                   {[5, 4, 3, 2, 1].map(star => (
-                    <div key={star} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY, width: 10 }}>{star}</span>
-                      <div style={{ flex: 1, height: 6, backgroundColor: APP_COLORS.BORDER, borderRadius: 3, overflow: 'hidden' }}>
-                        <div style={{ 
-                          height: '100%', 
-                          backgroundColor: APP_COLORS.PREMIUM_GOLD, 
-                          width: star === 5 ? '70%' : star === 4 ? '20%' : star === 3 ? '5%' : '2%' 
-                        }} />
+                    <div key={star} className="flex items-center gap-2">
+                      <span className="text-xs text-text-secondary w-2.5">{star}</span>
+                      <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden">
+                        <div className={`h-full bg-amber-500 ${
+                          star === 5 ? 'w-[70%]' : star === 4 ? 'w-[20%]' : star === 3 ? 'w-[5%]' : 'w-[2%]'
+                        }`} />
                       </div>
                     </div>
                   ))}
@@ -366,36 +253,26 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
 
               <motion.button 
                 whileTap={{ scale: 0.98 }}
-                style={{
-                  width: '100%',
-                  padding: 14,
-                  backgroundColor: 'transparent',
-                  border: `1px solid ${APP_COLORS.PRIMARY}`,
-                  color: APP_COLORS.PRIMARY,
-                  borderRadius: 12,
-                  fontWeight: 600,
-                  fontSize: 15,
-                  cursor: 'pointer'
-                }}
+                className="w-full p-3.5 bg-transparent border border-primary text-primary rounded-xl font-semibold text-[15px] cursor-pointer"
               >
                 {t.writeReview}
               </motion.button>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div className="flex flex-col gap-5">
                 {[
                   { id: 1, name: 'Ahmed Ali', avatar: 'https://i.pravatar.cc/150?u=1', rating: 5, text: 'Amazing place! The atmosphere is great and the service is excellent.', time: '2 days ago' },
                   { id: 2, name: 'Sara M.', avatar: 'https://i.pravatar.cc/150?u=2', rating: 4, text: 'Really good food, but it was a bit crowded when we visited.', time: '1 week ago' },
                   { id: 3, name: 'Mohammed K.', avatar: 'https://i.pravatar.cc/150?u=3', rating: 5, text: 'Best coffee in Baghdad. Highly recommended!', time: '2 weeks ago' },
                 ].map(review => (
-                  <div key={review.id} style={{ display: 'flex', gap: 12 }}>
-                    <img src={review.avatar} alt={review.name} style={{ width: 40, height: 40, borderRadius: 20 }} />
-                    <div style={{ flex: 1, textAlign: isRTL ? 'right' : 'left' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                        <span style={{ fontWeight: 600, fontSize: 14, color: APP_COLORS.TEXT_PRIMARY }}>{review.name}</span>
-                        <span style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY }}>{review.time}</span>
+                  <div key={review.id} className="flex gap-3">
+                    <img src={review.avatar} alt={review.name} className="w-10 h-10 rounded-full" />
+                    <div className={`flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-semibold text-sm text-text-primary">{review.name}</span>
+                        <span className="text-xs text-text-secondary">{review.time}</span>
                       </div>
-                      <div style={{ marginBottom: 8 }}>{renderStars(review.rating)}</div>
-                      <p style={{ margin: 0, fontSize: 14, color: APP_COLORS.TEXT_PRIMARY, lineHeight: 1.5 }}>{review.text}</p>
+                      <div className="mb-2">{renderStars(review.rating)}</div>
+                      <p className="m-0 text-sm text-text-primary leading-relaxed">{review.text}</p>
                     </div>
                   </div>
                 ))}
@@ -404,17 +281,17 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
           )}
 
           {activeTab === 'photos' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            <div className="grid grid-cols-3 gap-2">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => (
                 <motion.div 
                   key={i} 
                   whileHover={{ scale: 1.05 }}
-                  style={{ aspectRatio: '1/1', borderRadius: 8, overflow: 'hidden' }}
+                  className="aspect-square rounded-lg overflow-hidden"
                 >
                   <img 
                     src={`https://picsum.photos/seed/${business.id}-photo-${i}/200/200`} 
                     alt={`Photo ${i}`} 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    className="w-full h-full object-cover" 
                   />
                 </motion.div>
               ))}
@@ -422,19 +299,19 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
           )}
 
           {activeTab === 'map' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ width: '100%', height: 200, borderRadius: 16, overflow: 'hidden', backgroundColor: APP_COLORS.BORDER }}>
+            <div className="flex flex-col gap-4">
+              <div className="w-full h-50 rounded-2xl overflow-hidden bg-border">
                 <img 
                   src={`https://picsum.photos/seed/${business.id}-map/800/400`} 
                   alt="Map" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  className="w-full h-full object-cover" 
                 />
               </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                <MapPin size={20} color={APP_COLORS.PRIMARY} style={{ marginTop: 2 }} />
-                <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
-                  <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 4, color: APP_COLORS.TEXT_PRIMARY }}>{business.address}</div>
-                  <div style={{ color: APP_COLORS.TEXT_SECONDARY, fontSize: 14 }}>{govName}</div>
+              <div className="flex items-start gap-3">
+                <MapPin size={20} className="text-primary mt-0.5" />
+                <div className={isRTL ? 'text-right' : 'text-left'}>
+                  <div className="font-semibold text-[15px] mb-1 text-text-primary">{business.address}</div>
+                  <div className="text-text-secondary text-sm">{govName}</div>
                 </div>
               </div>
             </div>
@@ -443,76 +320,22 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
       </div>
 
       {/* Sticky Bottom Action Bar */}
-      <div style={{
-        position: 'sticky',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: APP_COLORS.SURFACE,
-        padding: '16px 20px',
-        borderTop: `1px solid ${APP_COLORS.BORDER}`,
-        display: 'flex',
-        gap: 12,
-        zIndex: 20,
-        boxShadow: '0 -4px 12px rgba(0,0,0,0.05)'
-      }}>
+      <div className="sticky bottom-0 left-0 right-0 bg-surface px-5 py-4 border-t border-border flex gap-3 z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
         <motion.button 
           whileTap={{ scale: 0.95 }}
-          style={{
-            flex: 1,
-            padding: '14px',
-            backgroundColor: APP_COLORS.PRIMARY,
-            color: 'white',
-            border: 'none',
-            borderRadius: 12,
-            fontWeight: 600,
-            fontSize: 15,
-            cursor: 'pointer',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 8
-          }}
+          className="flex-1 p-3.5 bg-primary text-white border-none rounded-xl font-semibold text-[15px] cursor-pointer flex justify-center items-center gap-2"
         >
           <Phone size={18} /> {t.callNow}
         </motion.button>
         <motion.button 
           whileTap={{ scale: 0.95 }}
-          style={{
-            flex: 1,
-            padding: '14px',
-            backgroundColor: '#25D366', // WhatsApp Green
-            color: 'white',
-            border: 'none',
-            borderRadius: 12,
-            fontWeight: 600,
-            fontSize: 15,
-            cursor: 'pointer',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 8
-          }}
+          className="flex-1 p-3.5 bg-[#25D366] text-white border-none rounded-xl font-semibold text-[15px] cursor-pointer flex justify-center items-center gap-2"
         >
           <MessageCircle size={18} /> {t.whatsapp}
         </motion.button>
         <motion.button 
           whileTap={{ scale: 0.95 }}
-          style={{
-            flex: 1,
-            padding: '14px',
-            backgroundColor: `${APP_COLORS.SECONDARY}15`,
-            color: APP_COLORS.SECONDARY,
-            border: 'none',
-            borderRadius: 12,
-            fontWeight: 600,
-            fontSize: 15,
-            cursor: 'pointer',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 8
-          }}
+          className="flex-1 p-3.5 bg-secondary/15 text-secondary border-none rounded-xl font-semibold text-[15px] cursor-pointer flex justify-center items-center gap-2"
         >
           <Navigation size={18} /> {t.directions}
         </motion.button>
@@ -521,19 +344,15 @@ export default function BusinessDetailScreen({ push, pop, business, lang, t, isR
   );
 }
 
-function InfoRow({ icon, text, color = APP_COLORS.TEXT_PRIMARY, dir = 'ltr', action, isRTL }: any) {
+function InfoRow({ icon, text, dir = 'ltr', action, isRTL }: any) {
   return (
-    <div style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'space-between'
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ color: APP_COLORS.TEXT_SECONDARY }}>{icon}</div>
-        <span style={{ ...TYPOGRAPHY.body, fontSize: 15, color, direction: dir as any }}>{text}</span>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <div className="text-text-secondary">{icon}</div>
+        <span className="text-[15px] text-text-primary" dir={dir}>{text}</span>
       </div>
       {action && (
-        <span style={{ color: APP_COLORS.PRIMARY, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+        <span className="text-primary text-sm font-semibold cursor-pointer">
           {action}
         </span>
       )}

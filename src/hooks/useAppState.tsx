@@ -21,8 +21,20 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return (localStorage.getItem('reborn_governorate') as GovernorateId) || 'baghdad';
   });
   
-  const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUserState] = useState<AppUser | null>(() => {
+    const stored = localStorage.getItem('reborn_user');
+    return stored ? JSON.parse(stored) : null;
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(!!currentUser);
+
+  const setCurrentUser = useCallback((user: AppUser | null) => {
+    setCurrentUserState(user);
+    if (user) {
+      localStorage.setItem('reborn_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('reborn_user');
+    }
+  }, []);
 
   const isRTL = language === 'ar' || language === 'ku';
 
