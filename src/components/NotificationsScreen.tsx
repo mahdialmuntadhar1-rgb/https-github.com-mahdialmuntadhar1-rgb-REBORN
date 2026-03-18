@@ -122,7 +122,7 @@ export default function NotificationsScreen({ pop, push, t, isRTL }: Props) {
           ) : (
             <ArrowLeft size={24} color={APP_COLORS.TEXT_PRIMARY} onClick={pop} style={{ cursor: 'pointer' }} />
           )}
-          <h1 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t.notifications}</h1>
+          <h1 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t('notifications')}</h1>
         </div>
         <button 
           onClick={markAllRead}
@@ -139,7 +139,7 @@ export default function NotificationsScreen({ pop, push, t, isRTL }: Props) {
           }}
         >
           <CheckCircle size={18} />
-          {t.markAllRead}
+          {t('markAllRead')}
         </button>
       </div>
 
@@ -194,7 +194,7 @@ export default function NotificationsScreen({ pop, push, t, isRTL }: Props) {
                   borderRadius: '50%', 
                   animation: 'spin 1s linear infinite'
                 }} />
-              ) : `${t.loadMore} ↓`}
+              ) : `${t('loadMore')} ↓`}
             </button>
           </div>
         )}

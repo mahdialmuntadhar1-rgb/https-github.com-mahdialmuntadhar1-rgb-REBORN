@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Screen } from '../types';
-import { APP_COLORS, TYPOGRAPHY, MOCK_BUSINESSES, CATEGORIES } from '../constants';
+import { Screen, Business, Governorate } from '../types';
+import { APP_COLORS, TYPOGRAPHY, MOCK_BUSINESSES, CATEGORIES, GOVERNORATES } from '../constants';
 import { Search, MapPin, Star, X, Clock, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -11,7 +11,7 @@ interface Props {
   isRTL: boolean;
 }
 
-export default function SearchScreen({ push, pop, t, isRTL }: Props) {
+export default function SearchScreen({ push, pop, t, isRTL, lang }: Props & { lang: string }) {
   const [query, setQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>(['مطاعم', 'مقاهي', 'مول بغداد', 'برجر']);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -43,9 +43,9 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
   };
 
   const filteredBusinesses = MOCK_BUSINESSES.filter(b => {
+    const name = b[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Business] as string;
     const matchesQuery = !query || 
-      b.name.toLowerCase().includes(query.toLowerCase()) || 
-      (b.nameAr && b.nameAr.includes(query)) || 
+      name.toLowerCase().includes(query.toLowerCase()) || 
       (t[CATEGORIES.find(c => c.id === b.category)?.nameKey || ''] || '').includes(query);
       
     const matchesCategory = selectedCategory === 'all' || b.category === selectedCategory;
@@ -119,7 +119,7 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
                   handleSearch(query);
                 }
               }}
-              placeholder={t.search}
+              placeholder={t('search')}
               style={{
                 flex: 1,
                 border: 'none',
@@ -188,7 +188,7 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
               >
                 <span style={{ fontSize: 14 }}>{cat.icon}</span>
                 <span style={{ fontSize: 13, fontWeight: isSelected ? 600 : 400 }}>
-                  {t[cat.nameKey] || cat.nameKey}
+                  {t(cat.nameKey)}
                 </span>
               </motion.div>
             );
@@ -201,7 +201,7 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
         {!query && selectedCategory === 'all' ? (
           /* Recent Searches */
           <div>
-            <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 16, marginBottom: 16, color: APP_COLORS.TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>{isRTL ? 'عمليات بحث سابقة' : 'Recent Searches'}</h3>
+            <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 16, marginBottom: 16, color: APP_COLORS.TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>{t('recentSearches')}</h3>
             {recentSearches.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {recentSearches.map(term => (
@@ -235,7 +235,7 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
               </div>
             ) : (
               <div style={{ textAlign: 'center', color: APP_COLORS.TEXT_MUTED, padding: '40px 0' }}>
-                {isRTL ? 'لا توجد عمليات بحث سابقة' : 'No recent searches'}
+                {t('noRecentSearches')}
               </div>
             )}
           </div>
@@ -244,10 +244,10 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 16, margin: 0, color: APP_COLORS.TEXT_PRIMARY }}>
-                {isRTL ? 'نتائج البحث' : 'Search Results'}
+                {t('searchResults')}
               </h3>
               <span style={{ fontSize: 13, color: APP_COLORS.TEXT_MUTED }}>
-                {filteredBusinesses.length} {isRTL ? 'نتيجة' : 'results'}
+                {filteredBusinesses.length} {t('results')}
               </span>
             </div>
 
@@ -271,7 +271,7 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
                       }}
                     >
                       <div style={{ position: 'relative', aspectRatio: '1/1' }}>
-                        <img src={business.coverImage || business.image} alt={business.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={business.coverUrl} alt={business[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Business] as string} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         {business.isPremium && (
                           <div style={{
                             position: 'absolute',
@@ -294,18 +294,18 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
                       </div>
                       <div style={{ padding: 12, flex: 1, display: 'flex', flexDirection: 'column', textAlign: isRTL ? 'right' : 'left' }}>
                         <h3 style={{ ...TYPOGRAPHY.headline, margin: '0 0 4px 0', fontSize: 14, lineHeight: 1.3 }}>
-                          {business.name}
+                          {business[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Business] as string}
                         </h3>
                         <p style={{ ...TYPOGRAPHY.body, margin: '0 0 8px 0', fontSize: 12, color: APP_COLORS.TEXT_SECONDARY, display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <MapPin size={12} /> {t[CATEGORIES.find(c => c.id === business.category)?.nameKey || ''] || business.category}
+                          <MapPin size={12} /> {t(CATEGORIES.find(c => c.id === business.category)?.nameKey || '')}
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 12 }}>
                           <Star size={14} color={APP_COLORS.PREMIUM_GOLD} fill={APP_COLORS.PREMIUM_GOLD} />
-                          <span style={{ fontSize: 12, fontWeight: 600 }}>{business.rating}</span>
-                          <span style={{ fontSize: 12, color: APP_COLORS.TEXT_MUTED }}>({business.reviewCount || business.reviews})</span>
+                          <span style={{ fontSize: 12, fontWeight: 600 }}>{business.rating || 4.8}</span>
+                          <span style={{ fontSize: 12, color: APP_COLORS.TEXT_MUTED }}>({business.reviewCount || 247})</span>
                         </div>
                         <div style={{ marginTop: 'auto', color: APP_COLORS.PRIMARY, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                          {isRTL ? 'عرض التفاصيل' : 'View Details'} <ChevronDown size={14} style={{ transform: isRTL ? 'rotate(90deg)' : 'rotate(-90deg)' }} />
+                          {t('viewDetails')} <ChevronDown size={14} style={{ transform: isRTL ? 'rotate(90deg)' : 'rotate(-90deg)' }} />
                         </div>
                       </div>
                     </motion.div>
@@ -340,7 +340,7 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
                         borderRadius: '50%', 
                         animation: 'spin 1s linear infinite'
                       }} />
-                    ) : `${t.loadMore} ↓`}
+                    ) : `${t('loadMore')} ↓`}
                   </button>
                 )}
               </>
@@ -355,11 +355,11 @@ export default function SearchScreen({ push, pop, t, isRTL }: Props) {
               }}>
                 <div style={{ fontSize: 64, marginBottom: 16 }}>🕵️‍♂️</div>
                 <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 18, marginBottom: 8, color: APP_COLORS.TEXT_PRIMARY }}>
-                  {isRTL ? 'لا توجد نتائج' : 'No results found'}
+                  {t('noResults')}
                 </h3>
                 <p style={{ ...TYPOGRAPHY.body, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY, lineHeight: 1.5 }}>
-                  {isRTL ? `لم نتمكن من العثور على أي نتائج لـ "${query}".` : `We couldn't find any results for "${query}".`}<br/>
-                  {isRTL ? 'جرب استخدام كلمات مختلفة أو تصفح الفئات.' : 'Try using different keywords or browse categories.'}
+                  {t('noResultsDesc')} "{query}".<br/>
+                  {t('noResultsTry')}
                 </p>
               </div>
             )}

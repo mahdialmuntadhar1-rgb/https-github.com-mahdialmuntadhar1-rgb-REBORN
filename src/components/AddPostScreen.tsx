@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Screen, Business } from '../types';
+import { Screen, Business, Governorate } from '../types';
 import { APP_COLORS, TYPOGRAPHY, MOCK_BUSINESSES, GOVERNORATES } from '../constants';
 import { X, Send, Camera, Video, Film, Type, Tag, MapPin, Eye, CheckCircle2, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -7,12 +7,15 @@ import { motion, AnimatePresence } from 'motion/react';
 interface Props {
   push: (screen: Screen, props?: Record<string, any>) => void;
   pop: () => void;
+  lang: string;
+  t: any;
+  isRTL: boolean;
   initialMode?: 'post' | 'story';
 }
 
 type MediaType = 'photo' | 'video' | 'reel' | 'text';
 
-export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props) {
+export default function AddPostScreen({ push, pop, lang, t, isRTL, initialMode = 'post' }: Props) {
   const [selectedBusiness, setSelectedBusiness] = useState<Business>(MOCK_BUSINESSES[0]);
   const [mediaType, setMediaType] = useState<MediaType>('photo');
   const [caption, setCaption] = useState('');
@@ -31,11 +34,20 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
   };
 
   const mediaTypes: { id: MediaType; icon: React.ReactNode; label: string }[] = [
-    { id: 'photo', icon: <Camera size={18} />, label: 'صورة' },
-    { id: 'video', icon: <Video size={18} />, label: 'فيديو' },
-    { id: 'reel', icon: <Film size={18} />, label: 'ريل' },
-    { id: 'text', icon: <Type size={18} />, label: 'نص' },
+    { id: 'photo', icon: <Camera size={18} />, label: t('photo') },
+    { id: 'video', icon: <Video size={18} />, label: t('video') },
+    { id: 'reel', icon: <Film size={18} />, label: t('reel') },
+    { id: 'text', icon: <Type size={18} />, label: t('text') },
   ];
+
+  const getBusinessName = (b: Business) => {
+    return b[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Business] as string;
+  };
+
+  const getGovName = (id: string) => {
+    const gov = GOVERNORATES.find(g => g.id === id);
+    return gov?.[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Governorate] || id;
+  };
 
   return (
     <motion.div 
@@ -83,9 +95,9 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
           }}
         >
           <X size={20} />
-          إلغاء
+          {t('cancel')}
         </button>
-        <h2 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>إضافة منشور</h2>
+        <h2 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t('addPost')}</h2>
         <button 
           onClick={handleShare}
           style={{ 
@@ -100,7 +112,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
             fontWeight: 600
           }}
         >
-          مشاركة
+          {t('share')}
           <Send size={18} />
         </button>
       </div>
@@ -108,7 +120,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
       <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 20 }}>
         {/* Business Selector */}
         <div style={{ position: 'relative' }}>
-          <label style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY, marginBottom: 8, display: 'block' }}>اختر العمل التجاري</label>
+          <label style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY, marginBottom: 8, display: 'block' }}>{t('selectBusiness')}</label>
           <div 
             onClick={() => setShowBusinessDropdown(!showBusinessDropdown)}
             style={{
@@ -126,7 +138,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
               <div style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: APP_COLORS.SUCCESS, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 12 }}>
                 🏢
               </div>
-              <span style={{ fontWeight: 600, color: APP_COLORS.SUCCESS }}>{selectedBusiness.nameAr || selectedBusiness.name}</span>
+              <span style={{ fontWeight: 600, color: APP_COLORS.SUCCESS }}>{getBusinessName(selectedBusiness)}</span>
             </div>
             <ChevronDown size={18} color={APP_COLORS.SUCCESS} />
           </div>
@@ -167,7 +179,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
                       color: APP_COLORS.TEXT_PRIMARY
                     }}
                   >
-                    {b.nameAr || b.name}
+                    {getBusinessName(b)}
                   </div>
                 ))}
               </motion.div>
@@ -220,7 +232,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
           {mediaType === 'text' ? (
             <div style={{ padding: 40, textAlign: 'center' }}>
               <Type size={48} style={{ marginBottom: 15 }} />
-              <p style={{ fontSize: 14 }}>اكتب نصاً للمشاركة</p>
+              <p style={{ fontSize: 14 }}>{t('writeText')}</p>
             </div>
           ) : (
             <>
@@ -233,7 +245,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
                 {mediaType === 'photo' && <Camera size={48} />}
                 {mediaType === 'video' && <Video size={48} />}
                 {mediaType === 'reel' && <Film size={48} />}
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>اضغط لتغيير الوسائط</p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>{t('tapToChangeMedia')}</p>
               </div>
             </>
           )}
@@ -245,7 +257,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
             ✍️
           </div>
           <textarea
-            placeholder="اكتب تعليقاً..."
+            placeholder={t('writeCaption')}
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             style={{
@@ -257,8 +269,8 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
               fontSize: 16,
               color: APP_COLORS.TEXT_PRIMARY,
               resize: 'none',
-              fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-              direction: 'rtl'
+              fontFamily: isRTL ? "'Noto Naskh Arabic', sans-serif" : "'Inter', sans-serif",
+              direction: isRTL ? 'rtl' : 'ltr'
             }}
           />
         </div>
@@ -270,7 +282,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
           <Tag size={20} color={APP_COLORS.TEXT_SECONDARY} />
           <input 
             type="text"
-            placeholder="إضافة تاغات..."
+            placeholder={t('addTags')}
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             style={{
@@ -280,7 +292,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
               outline: 'none',
               fontSize: 14,
               color: APP_COLORS.TEXT_PRIMARY,
-              fontFamily: "'IBM Plex Sans Arabic', sans-serif"
+              fontFamily: isRTL ? "'Noto Naskh Arabic', sans-serif" : "'Inter', sans-serif"
             }}
           />
         </div>
@@ -294,7 +306,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
             <MapPin size={20} color={APP_COLORS.TEXT_SECONDARY} />
             <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 14, color: APP_COLORS.TEXT_PRIMARY }}>
-                الموقع: {GOVERNORATES.find(g => g.id === location)?.name.ar}
+                {t('location')}: {getGovName(location)}
               </span>
               <ChevronDown size={16} color={APP_COLORS.TEXT_SECONDARY} />
             </div>
@@ -336,7 +348,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
                       color: APP_COLORS.TEXT_PRIMARY
                     }}
                   >
-                    {g.name.ar}
+                    {getGovName(g.id)}
                   </div>
                 ))}
               </motion.div>
@@ -361,7 +373,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
             cursor: 'pointer'
           }}>
             <Eye size={20} />
-            معاينة
+            {t('preview')}
           </button>
           <button 
             onClick={handleShare}
@@ -380,7 +392,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
               cursor: 'pointer'
             }}
           >
-            مشاركة الآن
+            {t('shareNow')}
           </button>
         </div>
       </div>
@@ -409,7 +421,7 @@ export default function AddPostScreen({ push, pop, initialMode = 'post' }: Props
             }}
           >
             <CheckCircle2 size={20} color={APP_COLORS.SUCCESS} />
-            <span style={{ fontWeight: 600 }}>تمت مشاركة المنشور! ✓</span>
+            <span style={{ fontWeight: 600 }}>{t('postShared')} ✓</span>
           </motion.div>
         )}
       </AnimatePresence>

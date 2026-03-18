@@ -120,7 +120,7 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
           ) : (
             <ArrowLeft size={24} color={APP_COLORS.TEXT_PRIMARY} onClick={pop} style={{ cursor: 'pointer' }} />
           )}
-          <h1 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t.profile}</h1>
+          <h1 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t('profile')}</h1>
         </div>
         <button style={{ 
           display: 'flex', 
@@ -133,18 +133,18 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
           fontSize: 14,
           fontWeight: 600
         }}>
-          {t.edit} <Edit2 size={16} />
+          {t('edit')} <Edit2 size={16} />
         </button>
       </div>
 
       {/* User Info */}
       <div style={{ padding: '30px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: APP_COLORS.SURFACE }}>
         <img 
-          src={user.avatar} 
-          alt={user.name} 
+          src={user.avatarUrl} 
+          alt={user.displayName} 
           style={{ width: 80, height: 80, borderRadius: 40, objectFit: 'cover', marginBottom: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} 
         />
-        <h2 style={{ ...TYPOGRAPHY.headline, margin: '0 0 4px 0', fontSize: 22 }}>{user.name}</h2>
+        <h2 style={{ ...TYPOGRAPHY.headline, margin: '0 0 4px 0', fontSize: 22 }}>{user.displayName}</h2>
         <p style={{ ...TYPOGRAPHY.body, margin: '0 0 8px 0', fontSize: 14, color: APP_COLORS.TEXT_SECONDARY }}>{user.email}</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: APP_COLORS.TEXT_SECONDARY }}>
           <MapPin size={16} />
@@ -155,15 +155,15 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
         <div style={{ display: 'flex', gap: 40, marginTop: 24 }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontWeight: 700, fontSize: 18 }}>24</div>
-            <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY }}>{t.following}</div>
+            <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY }}>{t('following')}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontWeight: 700, fontSize: 18 }}>118</div>
-            <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY }}>{t.followers}</div>
+            <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY }}>{t('followers')}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontWeight: 700, fontSize: 18 }}>{myPosts.length}</div>
-            <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY }}>{t.posts}</div>
+            <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY }}>{t('posts')}</div>
           </div>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
       {/* My Posts Section */}
       <div style={{ marginTop: 12, backgroundColor: APP_COLORS.SURFACE, padding: '20px 0' }}>
         <div style={{ padding: '0 20px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ ...TYPOGRAPHY.headline, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY, whiteSpace: 'nowrap' }}>{t.posts}</span>
+          <span style={{ ...TYPOGRAPHY.headline, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY, whiteSpace: 'nowrap' }}>{t('posts')}</span>
           <div style={{ flex: 1, height: 1, backgroundColor: APP_COLORS.BORDER }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, padding: '0 2px' }}>
@@ -216,7 +216,7 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
                   borderRadius: '50%', 
                   animation: 'spin 1s linear infinite'
                 }} />
-              ) : `${t.loadMore} ↓`}
+              ) : `${t('loadMore')} ↓`}
             </button>
           </div>
         )}
@@ -225,35 +225,37 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
       {/* Saved Businesses Section */}
       <div style={{ marginTop: 12, backgroundColor: APP_COLORS.SURFACE, padding: '20px 0' }}>
         <div style={{ padding: '0 20px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ ...TYPOGRAPHY.headline, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY, whiteSpace: 'nowrap' }}>{t.saved}</span>
+          <span style={{ ...TYPOGRAPHY.headline, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY, whiteSpace: 'nowrap' }}>{t('saved')}</span>
           <div style={{ flex: 1, height: 1, backgroundColor: APP_COLORS.BORDER }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, padding: '0 20px' }}>
-          {visibleSaved.map(business => (
-            <motion.div 
-              key={business.id}
-              whileHover={{ translateY: -2 }}
-              onClick={() => push('BusinessDetail', { business })}
-              style={{
-                backgroundColor: APP_COLORS.SURFACE,
-                borderRadius: 12,
-                overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                border: `1px solid ${APP_COLORS.BORDER}`,
-                cursor: 'pointer',
-                transition: 'box-shadow 0.3s ease'
-              }}
-            >
-              <img src={business.coverImage || business.image} alt={business.name} style={{ width: '100%', height: 100, objectFit: 'cover' }} />
-              <div style={{ padding: 10, textAlign: isRTL ? 'right' : 'left' }}>
-                <h4 style={{ ...TYPOGRAPHY.headline, margin: '0 0 4px 0', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{business.name}</h4>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <Star size={12} color={APP_COLORS.PREMIUM_GOLD} fill={APP_COLORS.PREMIUM_GOLD} />
-                  <span style={{ fontSize: 11, fontWeight: 600 }}>{business.rating}</span>
+            {visibleSaved.map(business => (
+              <motion.div 
+                key={business.id}
+                whileHover={{ translateY: -2 }}
+                onClick={() => push('BusinessDetail', { business })}
+                style={{
+                  backgroundColor: APP_COLORS.SURFACE,
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  border: `1px solid ${APP_COLORS.BORDER}`,
+                  cursor: 'pointer',
+                  transition: 'box-shadow 0.3s ease'
+                }}
+              >
+                <img src={business.coverUrl} alt={business[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Business] as string} style={{ width: '100%', height: 100, objectFit: 'cover' }} />
+                <div style={{ padding: 10, textAlign: isRTL ? 'right' : 'left' }}>
+                  <h4 style={{ ...TYPOGRAPHY.headline, margin: '0 0 4px 0', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {business[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Business] as string}
+                  </h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Star size={12} color={APP_COLORS.PREMIUM_GOLD} fill={APP_COLORS.PREMIUM_GOLD} />
+                    <span style={{ fontSize: 11, fontWeight: 600 }}>{business.rating || 4.8}</span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
         </div>
         {hasMoreSaved && (
           <div style={{ padding: '0 20px', marginTop: 15 }}>
@@ -283,7 +285,7 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
                   borderRadius: '50%', 
                   animation: 'spin 1s linear infinite'
                 }} />
-              ) : `${t.loadMore} ↓`}
+              ) : `${t('loadMore')} ↓`}
             </button>
           </div>
         )}
@@ -292,45 +294,45 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
       {/* Settings Section */}
       <div style={{ marginTop: 12, backgroundColor: APP_COLORS.SURFACE, padding: '20px 0' }}>
         <div style={{ padding: '0 20px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ ...TYPOGRAPHY.headline, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY, whiteSpace: 'nowrap' }}>{t.settings}</span>
+          <span style={{ ...TYPOGRAPHY.headline, fontSize: 14, color: APP_COLORS.TEXT_SECONDARY, whiteSpace: 'nowrap' }}>{t('settings')}</span>
           <div style={{ flex: 1, height: 1, backgroundColor: APP_COLORS.BORDER }} />
         </div>
         
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <SettingItem 
             icon={<Globe size={20} color={APP_COLORS.TEXT_SECONDARY} />} 
-            label={t.language} 
+            label={t('language')} 
             value={lang === 'en' ? 'English' : lang === 'ar' ? 'العربية' : 'کوردی'} 
             onClick={() => setShowLangModal(true)}
             isRTL={isRTL}
           />
           <SettingItem 
             icon={<Moon size={20} color={APP_COLORS.TEXT_SECONDARY} />} 
-            label={t.darkMode} 
+            label={t('darkMode')} 
             action={renderToggle(darkMode, setDarkMode)}
             isRTL={isRTL}
           />
           <SettingItem 
             icon={<Bell size={20} color={APP_COLORS.TEXT_SECONDARY} />} 
-            label={t.notifications} 
+            label={t('notifications')} 
             action={renderToggle(notificationsEnabled, setNotificationsEnabled)}
             isRTL={isRTL}
           />
           <SettingItem 
             icon={<Share2 size={20} color={APP_COLORS.TEXT_SECONDARY} />} 
-            label={t.shareApp} 
+            label={t('shareApp')} 
             showArrow 
             isRTL={isRTL}
           />
           <SettingItem 
             icon={<Phone size={20} color={APP_COLORS.TEXT_SECONDARY} />} 
-            label={t.contactSupport} 
+            label={t('contactSupport')} 
             showArrow 
             isRTL={isRTL}
           />
           <SettingItem 
             icon={<LogOut size={20} color="#FF3B30" />} 
-            label={t.signOut} 
+            label={t('signOut')} 
             labelColor="#FF3B30"
             isRTL={isRTL}
           />
@@ -374,7 +376,7 @@ export default function ProfileScreen({ pop, push, t, isRTL, lang, setLang }: Pr
                 boxShadow: '0 -4px 20px rgba(0,0,0,0.1)'
               }}
             >
-              <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 18, marginBottom: 20, textAlign: isRTL ? 'right' : 'left' }}>{t.language}</h3>
+              <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 18, marginBottom: 20, textAlign: isRTL ? 'right' : 'left' }}>{t('language')}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[
                   { id: 'en', label: 'English' },

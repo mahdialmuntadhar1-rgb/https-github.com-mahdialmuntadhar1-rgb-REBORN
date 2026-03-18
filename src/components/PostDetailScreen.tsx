@@ -122,7 +122,7 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
         flexDirection: isRTL ? 'row' : 'row-reverse'
       }}>
         <ArrowLeft size={24} color={APP_COLORS.TEXT_PRIMARY} onClick={pop} style={{ cursor: 'pointer', transform: isRTL ? 'none' : 'rotate(180deg)' }} />
-        <h2 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{isRTL ? 'تفاصيل المنشور' : 'Post Detail'}</h2>
+        <h2 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{t('postDetail')}</h2>
       </div>
 
       {/* Content */}
@@ -165,7 +165,7 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexDirection: isRTL ? 'row' : 'row-reverse' }}>
             <div style={{ flex: 1, height: 1, backgroundColor: APP_COLORS.BORDER }} />
             <span style={{ color: APP_COLORS.TEXT_SECONDARY, fontSize: 14, fontWeight: 500 }}>
-              {isRTL ? 'التعليقات' : 'Comments'} ({post.comments + (comments.length - INITIAL_COMMENTS.length)})
+              {t('comments')} ({post.comments + (comments.length - INITIAL_COMMENTS.length)})
             </span>
             <div style={{ flex: 1, height: 1, backgroundColor: APP_COLORS.BORDER }} />
           </div>
@@ -223,7 +223,7 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
                   borderRadius: '50%', 
                   animation: 'spin 1s linear infinite'
                 }} />
-              ) : `${t.loadMore} ↓`}
+              ) : `${t('loadMore')} ↓`}
             </button>
           )}
         </div>
@@ -262,7 +262,7 @@ export default function PostDetailScreen({ push, pop, post, t, isRTL }: Props) {
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder={isRTL ? 'اكتب تعليقاً...' : 'Type a comment...'}
+            placeholder={t('writeCaption')}
             style={{
               flex: 1,
               border: 'none',

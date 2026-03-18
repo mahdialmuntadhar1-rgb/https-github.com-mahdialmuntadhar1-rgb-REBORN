@@ -1,20 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Screen, Business } from '../types';
-import { APP_COLORS, TYPOGRAPHY, CATEGORIES } from '../constants';
+import { Screen, Business, Governorate } from '../types';
+import { APP_COLORS, TYPOGRAPHY, CATEGORIES, GOVERNORATES } from '../constants';
 import { ChevronRight, ChevronLeft, Star, MapPin, Phone, Clock, Share2, Heart, MessageCircle, Navigation, Globe, Tag } from 'lucide-react';
 
 interface Props {
   push: (screen: Screen, props?: Record<string, any>) => void;
   pop: () => void;
   business?: Business;
+  lang: string;
   t: any;
   isRTL: boolean;
 }
 
-export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: Props) {
+export default function BusinessDetailScreen({ push, pop, business, lang, t, isRTL }: Props) {
   const [liked, setLiked] = useState(false);
   const [activeTab, setActiveTab] = useState<'about' | 'reviews' | 'photos' | 'map'>('about');
+
+  useEffect(() => {
+    if (business?.status === 'approved') {
+      push('BusinessMiniSite', { businessId: business.id });
+    }
+  }, [business, push]);
 
   if (!business) return (
     <div 
@@ -32,17 +39,20 @@ export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: 
     </div>
   );
 
+  const name = business[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Business] as string;
+  const description = business[`description${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Business] as string;
+  const govName = GOVERNORATES.find(g => g.id === business.governorateId)?.[`name${lang.charAt(0).toUpperCase()}${lang.slice(1)}` as keyof Governorate] || business.governorateId;
+
   const handleShare = async () => {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: isRTL ? (business.nameAr || business.name) : business.name,
-          text: `Check out ${isRTL ? (business.nameAr || business.name) : business.name} on Iraq Compass!`,
+          title: name,
+          text: `Check out ${name} on Iraq Compass!`,
           url: window.location.href,
         });
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        // Using a simple toast-like alert for now
         console.log('Link copied to clipboard!');
       }
     } catch (err) {
@@ -91,8 +101,8 @@ export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: 
       {/* Header Image */}
       <div style={{ position: 'relative', height: 240, flexShrink: 0 }}>
         <img 
-          src={business.coverImage || business.image} 
-          alt={business.name} 
+          src={business.coverUrl} 
+          alt={name} 
           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
         />
         
@@ -201,13 +211,11 @@ export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: 
       }}>
         <div style={{ marginBottom: 16, textAlign: isRTL ? 'right' : 'left' }}>
           <h1 style={{ ...TYPOGRAPHY.headline, margin: '0 0 4px 0', fontSize: 24, color: APP_COLORS.TEXT_PRIMARY }}>
-            {isRTL ? (business.nameAr || business.name) : business.name}
+            {name}
           </h1>
-          {(business.nameAr || business.nameKu) && (
-            <p style={{ ...TYPOGRAPHY.body, margin: 0, color: APP_COLORS.TEXT_SECONDARY, fontSize: 16 }}>
-              {isRTL ? business.name : (business.nameAr || business.nameKu)}
-            </p>
-          )}
+          <p style={{ ...TYPOGRAPHY.body, margin: 0, color: APP_COLORS.TEXT_SECONDARY, fontSize: 16 }}>
+            {govName}
+          </p>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
@@ -219,11 +227,11 @@ export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: 
             fontSize: 14
           }}>
             <Star size={16} color={APP_COLORS.PREMIUM_GOLD} fill={APP_COLORS.PREMIUM_GOLD} />
-            <span style={{ fontWeight: 600, color: APP_COLORS.TEXT_PRIMARY }}>{business.rating}</span>
-            <span>({business.reviewCount || business.reviews} {t.reviewsCount})</span>
+            <span style={{ fontWeight: 600, color: APP_COLORS.TEXT_PRIMARY }}>{business.rating || 4.8}</span>
+            <span>({business.reviewCount || 247} {t.reviewsCount})</span>
             <span>•</span>
             <MapPin size={14} />
-            <span>{business.city}, {business.governorate || 'Baghdad'}</span>
+            <span>{govName}</span>
           </div>
           
           <div style={{ 
@@ -246,7 +254,7 @@ export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: 
             {business.priceRange && (
               <>
                 <span>•</span>
-                <span style={{ fontWeight: 600 }}>{'💰'.repeat(business.priceRange)}</span>
+                <span style={{ fontWeight: 600 }}>{business.priceRange}</span>
               </>
             )}
           </div>
@@ -326,7 +334,7 @@ export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: 
               <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
                 <h3 style={{ ...TYPOGRAPHY.headline, fontSize: 16, marginBottom: 8, color: APP_COLORS.TEXT_PRIMARY }}>{t.description}</h3>
                 <p style={{ ...TYPOGRAPHY.body, fontSize: 15, lineHeight: 1.6, color: APP_COLORS.TEXT_PRIMARY }}>
-                  {isRTL ? (business.descriptionAr || business.description) : business.description}
+                  {description}
                 </p>
               </div>
             </div>
@@ -336,9 +344,9 @@ export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 36, fontWeight: 'bold', color: APP_COLORS.TEXT_PRIMARY }}>{business.rating}</div>
-                  {renderStars(Math.round(business.rating))}
-                  <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY, marginTop: 4 }}>{business.reviewCount || business.reviews} {t.reviewsCount}</div>
+                  <div style={{ fontSize: 36, fontWeight: 'bold', color: APP_COLORS.TEXT_PRIMARY }}>{business.rating || 4.8}</div>
+                  {renderStars(Math.round(business.rating || 4.8))}
+                  <div style={{ fontSize: 12, color: APP_COLORS.TEXT_SECONDARY, marginTop: 4 }}>{business.reviewCount || 247} {t.reviewsCount}</div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {[5, 4, 3, 2, 1].map(star => (
@@ -426,7 +434,7 @@ export default function BusinessDetailScreen({ push, pop, business, t, isRTL }: 
                 <MapPin size={20} color={APP_COLORS.PRIMARY} style={{ marginTop: 2 }} />
                 <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
                   <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 4, color: APP_COLORS.TEXT_PRIMARY }}>{business.address}</div>
-                  <div style={{ color: APP_COLORS.TEXT_SECONDARY, fontSize: 14 }}>{business.city}, {business.governorate || 'Baghdad'}</div>
+                  <div style={{ color: APP_COLORS.TEXT_SECONDARY, fontSize: 14 }}>{govName}</div>
                 </div>
               </div>
             </div>

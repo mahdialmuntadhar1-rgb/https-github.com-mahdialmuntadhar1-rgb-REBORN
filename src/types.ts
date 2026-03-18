@@ -1,5 +1,69 @@
 import React from 'react';
 
+export type Language = 'ar' | 'ku' | 'en';
+export type UserRole = 'user' | 'business_owner' | 'admin';
+export type GovernorateId = 'baghdad' | 'sulaymaniyah' | 'erbil' | 'basra' | 'nineveh' | 'anbar' | 'diyala' | 'babil' | 'karbala' | 'najaf' | 'wasit' | 'muthanna' | 'qadisiyyah' | 'dhi_qar' | 'maysan' | 'kirkuk' | 'saladin' | 'dahuk';
+
+export interface Governorate {
+  id: GovernorateId;
+  nameAr: string;
+  nameKu: string;
+  nameEn: string;
+  region: 'center' | 'south' | 'north' | 'kurdistan';
+}
+
+export interface AppUser {
+  id: string;
+  role: UserRole;
+  language: Language;
+  governorateId: GovernorateId;
+  displayName: string;
+  phone?: string;
+  email?: string;
+  avatarUrl?: string;
+  isVerified: boolean;
+  createdAt: string;
+}
+
+export interface Business {
+  id: string;
+  nameAr: string;
+  nameKu: string;
+  nameEn: string;
+  descriptionAr: string;
+  descriptionKu: string;
+  descriptionEn: string;
+  category: string;
+  governorateId: GovernorateId;
+  phone?: string;
+  address?: string;
+  logoUrl?: string;
+  coverUrl?: string;
+  isOpen?: boolean;
+  isVerified: boolean;
+  isPremium?: boolean;
+  isFeatured?: boolean;
+  rating?: number;
+  reviewCount?: number;
+  priceRange?: string;
+  tags?: string[];
+  openHours?: string;
+  subcategory?: string;
+  lat?: number;
+  lng?: number;
+  ownerId?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'unclaimed';
+  createdAt: string;
+}
+
+export interface AppState {
+  language: Language;
+  isRTL: boolean;
+  selectedGovernorate: GovernorateId;
+  currentUser: AppUser | null;
+  isAuthenticated: boolean;
+}
+
 export type Screen =
   | 'Home'
   | 'BusinessDetail'
@@ -13,7 +77,11 @@ export type Screen =
   | 'Notifications'
   | 'EventDetail'
   | 'DealDetail'
-  | 'MapView';
+  | 'MapView'
+  | 'ClaimBusiness'
+  | 'BusinessDashboard'
+  | 'BusinessMiniSite'
+  | 'AddBusinessPost';
 
 export interface NavFrame {
   screen: Screen;
@@ -21,15 +89,6 @@ export interface NavFrame {
 }
 
 export type TabType = 'shakumaku' | 'madinaty';
-
-export interface Governorate {
-  id: string;
-  name: {
-    en: string;
-    ar: string;
-    ku: string;
-  };
-}
 
 export interface Story {
   id: number;
@@ -63,42 +122,6 @@ export interface Subcategory {
   subcategories?: Subcategory[];
 }
 
-export interface Business {
-  id: string | number;
-  name: string;
-  nameAr?: string;
-  nameKu?: string;
-  coverImage?: string;
-  imageUrl?: string;
-  isPremium?: boolean;
-  isFeatured?: boolean;
-  category: string;
-  subcategory?: string;
-  rating: number;
-  distance?: number;
-  status?: string;
-  image?: string;
-  verified?: boolean;
-  isVerified?: boolean;
-  reviews?: number;
-  reviewCount?: number;
-  governorate?: string;
-  city?: string;
-  address?: string;
-  phone?: string;
-  whatsapp?: string;
-  website?: string;
-  description?: string;
-  descriptionAr?: string;
-  descriptionKu?: string;
-  openHours?: string;
-  isOpen?: boolean;
-  priceRange?: 1 | 2 | 3 | 4;
-  tags?: string[];
-  lat?: number;
-  lng?: number;
-}
-
 export interface HeroSlide {
   id: number;
   title: string;
@@ -130,23 +153,18 @@ export interface Deal {
   governorate?: string;
 }
 
-export interface User {
-  id: string;
-  name: string;
-  email?: string;
-  avatar: string;
-}
-
 export interface FeedPost {
   id: number;
   businessId: string | null;
   businessName: string;
   businessNameAr: string;
+  businessNameKu: string;
   avatar: string;
   category: string;
   timeAgo: string;
   caption: string;
   captionAr: string;
+  captionKu: string;
   media?: string | null;
   mediaType: 'image' | 'video' | 'reel' | 'text';
   likes: number;
@@ -154,6 +172,18 @@ export interface FeedPost {
   isLiked: boolean;
   verified: boolean;
   governorate: string;
+}
+
+export interface Reel {
+  id: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  creatorName: string;
+  creatorAvatar: string;
+  title: string;
+  likes: number;
+  comments: number;
+  governorateId: GovernorateId;
 }
 
 export interface Notification {
@@ -168,7 +198,11 @@ export interface Notification {
 
 export interface Comment {
   id: string;
-  author: User;
+  author: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
   text: string;
   timeAgo: string;
 }

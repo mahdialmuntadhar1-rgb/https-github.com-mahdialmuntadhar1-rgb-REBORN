@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FeedPost } from '../types';
 import { APP_COLORS, TYPOGRAPHY } from '../constants';
-import { Heart, MessageCircle, Share2, MoreHorizontal, MapPin } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, MapPin, Play, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Props {
@@ -10,6 +10,7 @@ interface Props {
   onBusinessClick: (id: string) => void;
   isRTL: boolean;
   t: any;
+  key?: React.Key;
 }
 
 export default function FeedPostCard({ post, onCommentClick, onBusinessClick, isRTL, t }: Props) {
@@ -26,104 +27,74 @@ export default function FeedPostCard({ post, onCommentClick, onBusinessClick, is
     setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
   };
 
+  const businessName = isRTL ? (post.businessNameAr || post.businessName) : post.businessName;
+  const caption = isRTL ? (post.captionAr || post.caption) : post.caption;
+
   return (
     <motion.div 
       whileHover={{ translateY: -2 }}
-      style={{
-        backgroundColor: APP_COLORS.SURFACE,
-        borderRadius: 16,
-        marginBottom: 20,
-        boxShadow: APP_COLORS.SHADOW,
-        overflow: 'hidden',
-        transition: 'box-shadow 0.3s ease'
-      }}
+      className="bg-[#1a1a2f] rounded-2xl mb-5 shadow-xl overflow-hidden border border-white/5"
     >
       {/* Header */}
-      <div style={{ padding: 15, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <div 
+      <div className="p-4 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <button 
             onClick={() => post.businessId && onBusinessClick(post.businessId)}
-            style={{ position: 'relative', cursor: 'pointer' }}
+            className="relative"
           >
             <img 
               src={post.avatar} 
               alt={post.businessName} 
-              style={{ width: 40, height: 40, borderRadius: 20, objectFit: 'cover' }} 
+              className="w-10 h-10 rounded-full object-cover border border-white/10" 
             />
-            {post.verified && (
-              <div style={{
-                position: 'absolute',
-                bottom: -2,
-                [isRTL ? 'left' : 'right']: -2,
-                backgroundColor: APP_COLORS.SECONDARY,
-                borderRadius: '50%',
-                width: 14,
-                height: 14,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: `2px solid ${APP_COLORS.SURFACE}`
-              }}>
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
+            {post.businessId && (
+              <div className="absolute -top-1 inset-inline-start-[-4px] bg-primary rounded-full px-1.5 py-0.5 flex items-center justify-center border border-[#1a1a2f] shadow-lg z-10">
+                <span className="text-[7px] font-black text-white uppercase tracking-tighter">BIZ</span>
               </div>
             )}
-          </div>
-          <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
-            <h4 
+            {post.verified && (
+              <div className="absolute -bottom-1 inset-inline-end-[-4px] bg-secondary rounded-full w-4 h-4 flex items-center justify-center border-2 border-[#1a1a2f]">
+                <CheckCircle2 size={10} className="text-white" />
+              </div>
+            )}
+          </button>
+          <div className="text-start">
+            <button 
               onClick={() => post.businessId && onBusinessClick(post.businessId)}
-              style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 14, cursor: 'pointer', color: APP_COLORS.TEXT_PRIMARY }}
+              className="text-sm font-bold text-white hover:text-primary transition-colors"
             >
-              {isRTL ? (post.businessNameAr || post.businessName) : post.businessName}
-            </h4>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: APP_COLORS.TEXT_SECONDARY, fontSize: 11, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+              {businessName}
+            </button>
+            <div className="flex items-center gap-2 text-[10px] text-white/40">
               <span>{post.category}</span>
               <span>•</span>
               <span>{post.timeAgo}</span>
             </div>
           </div>
         </div>
-        <MoreHorizontal size={20} color={APP_COLORS.TEXT_MUTED} style={{ cursor: 'pointer' }} />
+        <button className="text-white/20 hover:text-white/40 transition-colors">
+          <MoreHorizontal size={20} />
+        </button>
       </div>
 
       {/* Content */}
-      <div style={{ padding: '0 15px 12px', textAlign: isRTL ? 'right' : 'left' }}>
-        <p style={{ 
-          ...TYPOGRAPHY.body, 
-          margin: 0, 
-          fontSize: 14, 
-          lineHeight: 1.6, 
-          color: APP_COLORS.TEXT_PRIMARY
-        }}>
-          {isRTL ? (post.captionAr || post.caption) : post.caption}
+      <div className="px-4 pb-3 text-start">
+        <p className="text-sm leading-relaxed text-white/80">
+          {caption}
         </p>
       </div>
 
       {/* Media */}
       {post.media && (
-        <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', backgroundColor: '#000' }}>
+        <div className="relative w-full aspect-[4/3] bg-black/20">
           <img 
             src={post.media} 
             alt="Post content" 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            className="w-full h-full object-cover" 
           />
           {post.mediaType === 'reel' && (
-            <div style={{
-              position: 'absolute',
-              top: 15,
-              right: 15,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              padding: '4px 8px',
-              borderRadius: 4,
-              color: 'white',
-              fontSize: 10,
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4
-            }}>
-              <div style={{ width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent', borderLeft: '6px solid white' }} />
+            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md text-[10px] font-bold text-white flex items-center gap-1.5 border border-white/10">
+              <Play size={10} fill="white" />
               REEL
             </div>
           )}
@@ -131,34 +102,42 @@ export default function FeedPostCard({ post, onCommentClick, onBusinessClick, is
       )}
 
       {/* Actions */}
-      <div style={{ padding: '12px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-        <div style={{ display: 'flex', gap: 20, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <div 
+      <div className="p-4 flex justify-between items-center">
+        <div className="flex gap-6">
+          <button 
             onClick={toggleLike}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', flexDirection: isRTL ? 'row-reverse' : 'row' }}
+            className="flex items-center gap-2 transition-colors"
           >
             <motion.div
-              animate={{ scale: isLikeAnimating ? 1.3 : 1 }}
-              transition={{ duration: 0.2 }}
+              animate={{ scale: isLikeAnimating ? 1.4 : 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Heart size={22} color={isLiked ? APP_COLORS.PRIMARY : APP_COLORS.TEXT_PRIMARY} fill={isLiked ? APP_COLORS.PRIMARY : 'none'} />
+              <Heart 
+                size={20} 
+                className={isLiked ? 'text-primary fill-primary' : 'text-white/40 hover:text-white/60'} 
+              />
             </motion.div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: APP_COLORS.TEXT_PRIMARY }}>{likesCount}</span>
-          </div>
-          <div 
+            <span className={`text-xs font-bold ${isLiked ? 'text-primary' : 'text-white/40'}`}>{likesCount}</span>
+          </button>
+          
+          <button 
             onClick={onCommentClick}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', flexDirection: isRTL ? 'row-reverse' : 'row' }}
+            className="flex items-center gap-2 text-white/40 hover:text-white/60 transition-colors"
           >
-            <MessageCircle size={22} color={APP_COLORS.TEXT_PRIMARY} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: APP_COLORS.TEXT_PRIMARY }}>{post.comments}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-            <Share2 size={22} color={APP_COLORS.TEXT_PRIMARY} />
-          </div>
+            <MessageCircle size={20} />
+            <span className="text-xs font-bold">{post.comments}</span>
+          </button>
+          
+          <button className="text-white/40 hover:text-white/60 transition-colors">
+            <Share2 size={20} />
+          </button>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: APP_COLORS.TEXT_SECONDARY, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <MapPin size={14} />
-          <span style={{ fontSize: 12 }}>{post.governorate === 'baghdad' ? (isRTL ? 'بغداد' : 'Baghdad') : post.governorate}</span>
+        
+        <div className="flex items-center gap-1.5 text-white/30">
+          <MapPin size={12} />
+          <span className="text-[10px] font-medium">
+            {post.governorate.charAt(0).toUpperCase() + post.governorate.slice(1)}
+          </span>
         </div>
       </div>
     </motion.div>

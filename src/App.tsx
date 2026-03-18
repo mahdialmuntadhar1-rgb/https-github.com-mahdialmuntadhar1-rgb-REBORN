@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Screen, NavFrame } from './types';
-import { APP_COLORS, TYPOGRAPHY, TRANSLATIONS } from './constants';
+import { APP_COLORS, TYPOGRAPHY } from './constants';
 import { Home, Search, Plus, Bell, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AppStateProvider, useAppState } from './hooks/useAppState';
+import { PWAInstallBanner } from './components/PWAInstallBanner';
+import TopBar from './components/navigation/TopBar';
+import BottomNav from './components/navigation/BottomNav';
 
 import HomeScreen from './components/HomeScreen';
 import BusinessDetailScreen from './components/BusinessDetailScreen';
@@ -14,41 +18,95 @@ import NotificationsScreen from './components/NotificationsScreen';
 import AddPostScreen from './components/AddPostScreen';
 import CategoryBrowseScreen from './components/CategoryBrowseScreen';
 import CitySelectScreen from './components/CitySelectScreen';
+import ClaimBusinessScreen from './components/business/ClaimBusinessScreen';
+import BusinessDashboardScreen from './components/dashboard/BusinessDashboardScreen';
+import BusinessMiniSite from './components/dashboard/BusinessMiniSite';
+import AddBusinessPostScreen from './components/dashboard/AddBusinessPostScreen';
 
-export default function App() {
+// Auth Screens
+import { OnboardingCarousel } from './components/auth/OnboardingCarousel';
+import { AuthScreen } from './components/auth/AuthScreen';
+import { OTPScreen } from './components/auth/OTPScreen';
+import { ProfileSetupScreen } from './components/auth/ProfileSetupScreen';
+import { UserTypeScreen } from './components/auth/UserTypeScreen';
+import { BusinessClaimScreen } from './components/auth/BusinessClaimScreen';
+
+const ServiceWorkerRegistration = () => {
+  // Placeholder for service worker registration logic
+  return null;
+};
+
+type AuthStep = 'onboarding' | 'auth' | 'otp' | 'profile_setup' | 'user_type' | 'business_claim' | 'completed';
+
+function AppContent() {
+  const { t, isRTL, language, selectedGovernorate, setGovernorate, setLanguage, currentUser, isAuthenticated } = useAppState();
   const [navStack, setNavStack] = useState<NavFrame[]>([{ screen: 'Home' }]);
   const [activeTab, setActiveTab] = useState<Screen>('Home');
-  const [selectedCity, setSelectedCity] = useState('baghdad');
-  const [lang, setLang] = useState<'en' | 'ar' | 'ku'>('ar');
+  
+  // Auth Flow State
+  const [authStep, setAuthStep] = useState<AuthStep>(() => {
+    const onboardingDone = localStorage.getItem('onboarding_done') === 'true';
+    if (!onboardingDone) return 'onboarding';
+    return 'auth';
+  });
+  const [tempPhone, setTempPhone] = useState('');
+  const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (!currentUser?.displayName) {
+        setAuthStep('profile_setup');
+      } else if (!currentUser?.role) {
+        setAuthStep('user_type');
+      } else if (currentUser?.role === 'business_owner' && authStep !== 'completed') {
+        setAuthStep('business_claim');
+      } else {
+        setAuthStep('completed');
+      }
+    } else {
+      const onboardingDone = localStorage.getItem('onboarding_done') === 'true';
+      if (!onboardingDone) {
+        setAuthStep('onboarding');
+      } else {
+        setAuthStep('auth');
+      }
+    }
+  }, [isAuthenticated, currentUser, authStep]);
 
   const push = (screen: Screen, props?: Record<string, any>) => {
+    setDirection(1);
     setNavStack([...navStack, { screen, props }]);
   };
 
   const pop = () => {
     if (navStack.length > 1) {
+      setDirection(-1);
       setNavStack(navStack.slice(0, -1));
     }
   };
 
   const currentFrame = navStack[navStack.length - 1];
-  const t = TRANSLATIONS[lang];
-  const isRTL = lang === 'ar' || lang === 'ku';
+  const showTopBar = authStep === 'completed' && !['StoryViewer'].includes(currentFrame.screen);
+  const showBottomNav = authStep === 'completed' && !['StoryViewer', 'AddPost', 'BusinessDetail', 'PostDetail', 'Search', 'CategoryBrowse', 'AddBusinessPost', 'ClaimBusiness'].includes(currentFrame.screen);
 
   const renderScreen = () => {
-    const screenProps = { push, pop, lang, setLang, t, isRTL };
+    const screenProps = { push, pop, lang: language, t, isRTL };
     
     switch (currentFrame.screen) {
-      case 'Home': return <HomeScreen {...screenProps} selectedCity={selectedCity} setSelectedCity={setSelectedCity} />;
+      case 'Home': return <HomeScreen {...screenProps} selectedCity={selectedGovernorate} setSelectedCity={setGovernorate} />;
       case 'BusinessDetail': return <BusinessDetailScreen {...screenProps} {...currentFrame.props} />;
       case 'PostDetail': return <PostDetailScreen {...screenProps} {...currentFrame.props} />;
       case 'StoryViewer': return <StoryViewerScreen {...screenProps} {...currentFrame.props} />;
       case 'Search': return <SearchScreen {...screenProps} />;
-      case 'Profile': return <ProfileScreen {...screenProps} />;
+      case 'Profile': return <ProfileScreen {...screenProps} setLang={setLanguage} />;
       case 'Notifications': return <NotificationsScreen {...screenProps} />;
       case 'AddPost': return <AddPostScreen {...screenProps} />;
       case 'CategoryBrowse': return <CategoryBrowseScreen {...screenProps} categoryId={currentFrame.props?.categoryId} />;
-      case 'CitySelect': return <CitySelectScreen {...screenProps} selectedCity={selectedCity} setSelectedCity={setSelectedCity} />;
+      case 'CitySelect': return <CitySelectScreen {...screenProps} selectedCity={selectedGovernorate} setSelectedCity={setGovernorate} />;
+      case 'ClaimBusiness': return <ClaimBusinessScreen {...screenProps} business={currentFrame.props?.business} />;
+      case 'BusinessDashboard': return <BusinessDashboardScreen {...screenProps} />;
+      case 'BusinessMiniSite': return <BusinessMiniSite {...screenProps} businessId={currentFrame.props?.businessId} />;
+      case 'AddBusinessPost': return <AddBusinessPostScreen {...screenProps} business={currentFrame.props?.business} />;
       default: return (
         <div style={{ padding: 20, textAlign: 'center', paddingTop: 100 }}>
           <h2 style={{ ...TYPOGRAPHY.headline, color: APP_COLORS.TEXT_PRIMARY }}>{isRTL ? 'قريباً' : 'Coming Soon'}</h2>
@@ -66,147 +124,171 @@ export default function App() {
               cursor: 'pointer'
             }}
           >
-            {t.back}
+            {t('general_back')}
           </button>
         </div>
       );
     }
   };
 
-  const showBottomNav = !['StoryViewer', 'AddPost', 'BusinessDetail', 'PostDetail', 'Search', 'CategoryBrowse'].includes(currentFrame.screen);
+  const xOffset = isRTL ? -390 : 390;
+  const forwardX = direction * xOffset; // If forward (1) and LTR, comes from 390. If forward (1) and RTL, comes from -390.
+  // Wait, prompt said: "forward = slide from LEFT in LTR, slide from RIGHT in RTL"
+  // Slide from LEFT in LTR means initial x is -390.
+  // Slide from RIGHT in RTL means initial x is 390.
+  const promptForwardX = isRTL ? (direction * 390) : (direction * -390);
 
   return (
-    <div style={{
-      width: '100vw',
-      height: '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#f0f0f0',
-      overflow: 'hidden'
-    }}>
-      <div style={{
-        width: 390,
-        height: 844,
-        backgroundColor: APP_COLORS.BACKGROUND,
-        borderRadius: 44,
-        boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-        overflow: 'hidden',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-        color: APP_COLORS.TEXT_PRIMARY,
-        direction: isRTL ? 'rtl' : 'ltr',
-        border: '8px solid #1a1a1a'
-      }}>
+    <div className="flex items-center justify-center w-screen h-screen bg-[#f0f0f0] overflow-hidden">
+      <div className="relative flex flex-col w-[390px] h-[844px] bg-[#0a0a0f] rounded-[44px] shadow-2xl overflow-hidden border-[8px] border-[#1a1a1a] text-white" style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
         {/* Notch */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 150,
-          height: 30,
-          backgroundColor: '#1a1a1a',
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
-          zIndex: 1000
-        }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150px] h-[30px] bg-[#1a1a1a] rounded-b-[20px] z-[1000]" />
 
-        {/* Content Area with Transitions */}
-        <div className="no-scrollbar" style={{ 
-          flex: 1, 
-          overflowY: 'auto', 
+        {showTopBar && (
+          <TopBar 
+            title={currentFrame.screen === 'Home' ? undefined : t(`screen_${currentFrame.screen.toLowerCase()}`)}
+            showBack={navStack.length > 1}
+            onBack={pop}
+            onNotificationClick={() => {
+              setActiveTab('Notifications');
+              setNavStack([{ screen: 'Notifications' }]);
+            }}
+          />
+        )}
+
+        {/* Auth Flow vs Main App */}
+        <div className="relative flex-1 overflow-y-auto no-scrollbar" style={{ 
+          paddingTop: showTopBar ? 64 : 0,
           paddingBottom: showBottomNav ? 80 : 0,
-          position: 'relative'
         }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentFrame.screen + (currentFrame.props?.id || '')}
-              initial={{ x: isRTL ? -100 : 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: isRTL ? 100 : -100, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              style={{ width: '100%', height: '100%' }}
-            >
-              {renderScreen()}
-            </motion.div>
+          <AnimatePresence mode="wait" initial={false} custom={direction}>
+            {authStep === 'onboarding' && (
+              <motion.div
+                key="onboarding"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0"
+              >
+                <OnboardingCarousel onComplete={() => { setDirection(1); setAuthStep('auth'); }} />
+              </motion.div>
+            )}
+
+            {authStep === 'auth' && (
+              <motion.div
+                key="auth"
+                initial={{ x: promptForwardX, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -promptForwardX, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="absolute inset-0"
+              >
+                <AuthScreen 
+                  onPhoneSubmit={(phone) => { 
+                    setTempPhone(phone); 
+                    setDirection(1);
+                    setAuthStep('otp'); 
+                  }}
+                  onSuccess={() => setDirection(1)} 
+                />
+              </motion.div>
+            )}
+
+            {authStep === 'otp' && (
+              <motion.div
+                key="otp"
+                initial={{ x: promptForwardX, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -promptForwardX, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="absolute inset-0"
+              >
+                <OTPScreen 
+                  phoneNumber={tempPhone}
+                  onBack={() => { setDirection(-1); setAuthStep('auth'); }}
+                  onSuccess={() => setDirection(1)}
+                />
+              </motion.div>
+            )}
+
+            {authStep === 'profile_setup' && (
+              <motion.div
+                key="profile_setup"
+                initial={{ x: promptForwardX, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -promptForwardX, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="absolute inset-0"
+              >
+                <ProfileSetupScreen onSuccess={() => setDirection(1)} />
+              </motion.div>
+            )}
+
+            {authStep === 'user_type' && (
+              <motion.div
+                key="user_type"
+                initial={{ x: promptForwardX, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -promptForwardX, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="absolute inset-0"
+              >
+                <UserTypeScreen onSuccess={() => setDirection(1)} />
+              </motion.div>
+            )}
+
+            {authStep === 'business_claim' && (
+              <motion.div
+                key="business_claim"
+                initial={{ x: promptForwardX, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -promptForwardX, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="absolute inset-0"
+              >
+                <BusinessClaimScreen onComplete={() => { setDirection(1); setAuthStep('completed'); }} />
+              </motion.div>
+            )}
+
+            {authStep === 'completed' && (
+              <motion.div
+                key={currentFrame.screen + (currentFrame.props?.id || '')}
+                initial={{ x: promptForwardX, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -promptForwardX, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="w-full h-full"
+              >
+                {renderScreen()}
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 
         {/* Bottom Navigation */}
         {showBottomNav && (
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 80,
-            backgroundColor: APP_COLORS.SURFACE,
-            borderTop: `1px solid ${APP_COLORS.BORDER}`,
-            display: 'flex',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            paddingBottom: 20,
-            zIndex: 100
-          }}>
-            <Tab icon={<Home />} label={t.shakumaku} isActive={activeTab === 'Home'} onClick={() => { setActiveTab('Home'); setNavStack([{screen: 'Home'}]); }} />
-            <Tab icon={<Search />} label={t.search.split(' ')[0]} isActive={activeTab === 'Search'} onClick={() => { setActiveTab('Search'); setNavStack([{screen: 'Search'}]); }} />
-            
-            {/* Add Post Button */}
-            <motion.div 
-              onClick={() => push('AddPost')}
-              whileTap={{ scale: 0.9 }}
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 28,
-                backgroundColor: APP_COLORS.PRIMARY,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                color: 'white',
-                transform: 'translateY(-20px)',
-                boxShadow: `0 4px 12px ${APP_COLORS.PRIMARY}80`,
-                cursor: 'pointer'
-              }}
-            >
-              <Plus size={28} />
-            </motion.div>
-
-            <Tab icon={<Bell />} label={t.notifications} isActive={activeTab === 'Notifications'} onClick={() => { setActiveTab('Notifications'); setNavStack([{screen: 'Notifications'}]); }} />
-            <Tab icon={<User />} label={t.profile} isActive={activeTab === 'Profile'} onClick={() => { setActiveTab('Profile'); setNavStack([{screen: 'Profile'}]); }} />
-          </div>
+          <BottomNav 
+            activeTab={activeTab} 
+            onTabChange={(tab) => {
+              setActiveTab(tab);
+              setNavStack([{ screen: tab }]);
+            }}
+            unreadCount={2}
+          />
         )}
+        
+        <PWAInstallBanner />
       </div>
     </div>
   );
 }
 
-function Tab({ icon, label, isActive, onClick }: any) {
-  const [isHovered, setIsHovered] = useState(false);
-  
+export default function App() {
   return (
-    <div 
-      onClick={onClick} 
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        color: isActive ? APP_COLORS.PRIMARY : (isHovered ? APP_COLORS.PRIMARY : APP_COLORS.TEXT_SECONDARY),
-        cursor: 'pointer',
-        padding: '8px 12px',
-        borderRadius: 16,
-        backgroundColor: isActive ? `${APP_COLORS.PRIMARY}15` : (isHovered ? `${APP_COLORS.PRIMARY}0A` : 'transparent'),
-        transition: 'all 0.2s',
-        minWidth: 60
-      }}
-    >
-      {React.cloneElement(icon, { size: 24 })}
-      <span style={{ fontSize: 10, marginTop: 4, fontWeight: isActive ? 600 : 400 }}>{label}</span>
-    </div>
+    <AppStateProvider>
+      <ServiceWorkerRegistration />
+      <AppContent />
+    </AppStateProvider>
   );
 }
+

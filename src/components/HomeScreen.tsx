@@ -1,426 +1,367 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Screen, Story, Business, TabType, FeedPost } from '../types';
-import { APP_COLORS, TYPOGRAPHY, MOCK_STORIES, MOCK_BUSINESSES, HERO_SLIDES, GOVERNORATES, MOCK_FEED_POSTS, CATEGORIES, TRANSLATIONS } from '../constants';
-import { MapPin, Star, Heart, MessageCircle, Share2, Compass, ChevronDown, Search, Bell, Play, MoreHorizontal, SlidersHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Search, Plus, Play, MoreVertical, Heart, MessageCircle, 
+  Share2, MapPin, Star, CheckCircle2, Compass, Bell, 
+  ChevronDown, X, Camera, Store 
+} from 'lucide-react';
+import { useAppState } from '../hooks/useAppState';
+import { 
+  APP_COLORS, TYPOGRAPHY, MOCK_STORIES, MOCK_BUSINESSES, 
+  GOVERNORATES, MOCK_FEED_POSTS, CATEGORIES, MOCK_REELS 
+} from '../constants';
+import { Screen, TabType, FeedPost, Reel, Business, Story } from '../types';
 import FeedPostCard from './FeedPostCard';
+import BusinessPostcard from './business/BusinessPostcard';
+import BusinessPostcardModal from './business/BusinessPostcardModal';
+import { useBusinessFilter } from '../hooks/useBusinessFilter';
 
 interface Props {
   push: (screen: Screen, props?: Record<string, any>) => void;
   selectedCity: string;
-  setSelectedCity: (city: string) => void;
-  lang: 'en' | 'ar' | 'ku';
+  setSelectedCity: (city: any) => void;
+  lang: string;
   t: any;
   isRTL: boolean;
 }
 
-export default function HomeScreen({ push, selectedCity, setSelectedCity, lang, t, isRTL }: Props) {
-  const [page, setPage] = useState(1);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+export default function HomeScreen({ push }: Props) {
+  const { language, isRTL, selectedGovernorate, setGovernorate, t } = useAppState();
   const [activeTab, setActiveTab] = useState<TabType>('shakumaku');
+  const [showFABMenu, setShowFABMenu] = useState(false);
 
-  const PAGE_SIZE = 5;
-  const visiblePosts = MOCK_FEED_POSTS.slice(0, page * PAGE_SIZE);
-  const hasMore = visiblePosts.length < MOCK_FEED_POSTS.length;
-
-  const handleLoadMore = async () => {
-    setIsLoadingMore(true);
-    await new Promise(r => setTimeout(r, 800)); // simulate fetch
-    setPage(p => p + 1);
-    setIsLoadingMore(false);
-  };
-
-  const selectedCityName = GOVERNORATES.find(g => g.id === selectedCity)?.name[lang] || 'Baghdad';
-
-  return (
-    <div style={{ paddingBottom: 20 }}>
-      {/* 1A. STICKY HEADER */}
-      <div style={{
-        padding: '20px 20px 15px',
-        backgroundColor: APP_COLORS.SURFACE,
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        boxShadow: APP_COLORS.SHADOW,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8
-          }}>
-            <Compass size={28} color={APP_COLORS.PRIMARY} />
-            <h1 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 20, color: APP_COLORS.PRIMARY }}>{t.appName}</h1>
-          </div>
-          <div 
-            onClick={() => push('CitySelect')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '6px 12px',
-              backgroundColor: `${APP_COLORS.SECONDARY}15`,
-              borderRadius: 20,
-              color: APP_COLORS.SECONDARY,
-              cursor: 'pointer'
-            }}
-          >
-            <ChevronDown size={16} />
-            <span style={{ fontSize: 14, fontWeight: 600 }}>{selectedCityName}</span>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 15 }}>
-          <Bell size={24} color={APP_COLORS.TEXT_PRIMARY} onClick={() => push('Notifications')} style={{ cursor: 'pointer' }} />
-          <Search size={24} color={APP_COLORS.TEXT_PRIMARY} onClick={() => push('Search')} style={{ cursor: 'pointer' }} />
-        </div>
-      </div>
-
-      {/* 1B. HERO CAROUSEL */}
-      <HeroCarousel t={t} isRTL={isRTL} />
-
-      {/* 1C. CITY FILTER BAR */}
-      <CityFilterBar selectedCity={selectedCity} setSelectedCity={setSelectedCity} lang={lang} isRTL={isRTL} />
-
-      {/* 1D. TAB BAR */}
-      <TabBar activeTab={activeTab} setActiveTab={setActiveTab} t={t} isRTL={isRTL} />
-
-      {activeTab === 'shakumaku' && (
-        <>
-          {/* Stories */}
-          <div className="no-scrollbar" style={{
-            display: 'flex',
-            overflowX: 'auto',
-            padding: '20px',
-            gap: 15,
-            backgroundColor: APP_COLORS.SURFACE,
-            marginBottom: 10,
-            alignItems: 'flex-start'
-          }}>
-            {/* Add Your Story */}
-            <div 
-              onClick={() => push('AddPost', { mode: 'story' })}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 6,
-                cursor: 'pointer',
-                width: 70
-              }}
-            >
-              <div style={{
-                width: 64,
-                height: 64,
-                borderRadius: 32,
-                border: `2px dashed ${APP_COLORS.TEXT_MUTED}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: APP_COLORS.BACKGROUND
-              }}>
-                <div style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 12,
-                  backgroundColor: APP_COLORS.PRIMARY,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: 18,
-                  lineHeight: 1
-                }}>
-                  +
-                </div>
-              </div>
-              <span style={{ 
-                fontSize: 11, 
-                color: APP_COLORS.TEXT_SECONDARY, 
-                width: '100%', 
-                textAlign: 'center', 
-                whiteSpace: 'nowrap', 
-                overflow: 'hidden', 
-                textOverflow: 'ellipsis',
-                fontFamily: "'IBM Plex Sans Arabic', sans-serif"
-              }}>
-                {t.addPost}
-              </span>
-            </div>
-
-            {MOCK_STORIES.map(story => (
-              <StoryCircle key={story.id} story={story} onClick={() => push('StoryViewer', { initialStoryId: story.id })} />
-            ))}
-          </div>
-
-          {/* Featured Businesses */}
-          <div style={{ padding: '0 20px', marginBottom: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
-              <h2 style={{ ...TYPOGRAPHY.headline, margin: 0, fontSize: 18 }}>{isRTL ? 'أماكن مميزة' : 'Featured Places'}</h2>
-              <span onClick={() => push('CategoryBrowse')} style={{ color: APP_COLORS.PRIMARY, fontSize: 14, cursor: 'pointer' }}>{isRTL ? 'عرض الكل' : 'View All'}</span>
-            </div>
-            <div className="no-scrollbar" style={{ display: 'flex', overflowX: 'auto', gap: 15, paddingBottom: 10 }}>
-              {MOCK_BUSINESSES.map(business => (
-                <BusinessCard key={business.id} business={business} onClick={() => push('BusinessDetail', { business })} />
-              ))}
-            </div>
-          </div>
-
-          {/* Feed */}
-          <div style={{ padding: '0 20px' }}>
-            <h2 style={{ ...TYPOGRAPHY.headline, margin: '0 0 15px 0', fontSize: 18, textAlign: isRTL ? 'right' : 'left' }}>{isRTL ? 'أحدث التجارب' : 'Latest Experiences'}</h2>
-            {visiblePosts.map((post, index) => (
-              <React.Fragment key={post.id}>
-                <FeedPostCard 
-                  post={post} 
-                  onCommentClick={() => push('PostDetail', { post })} 
-                  onBusinessClick={(bId) => {
-                    const b = MOCK_BUSINESSES.find(x => x.id === bId);
-                    if(b) push('BusinessDetail', { business: b });
-                  }} 
-                  isRTL={isRTL}
-                  t={t}
-                />
-                {/* Inline Story every 4 posts */}
-                {(index + 1) % 4 === 0 && MOCK_STORIES[Math.floor(index / 4)] && (
-                  <InlineStoryCard 
-                    story={MOCK_STORIES[Math.floor(index / 4)]} 
-                    onClick={() => push('StoryViewer', { initialStoryId: MOCK_STORIES[Math.floor(index / 4)].id })} 
-                  />
-                )}
-              </React.Fragment>
-            ))}
-            
-            {hasMore && (
-              <button 
-                onClick={handleLoadMore}
-                disabled={isLoadingMore}
-                style={{
-                  width: '100%',
-                  padding: 15,
-                  backgroundColor: APP_COLORS.SURFACE,
-                  border: `1px solid ${APP_COLORS.BORDER}`,
-                  borderRadius: 12,
-                  color: APP_COLORS.PRIMARY,
-                  ...TYPOGRAPHY.headline,
-                  cursor: 'pointer',
-                  marginTop: 10,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-              >
-                {isLoadingMore ? (
-                  <div style={{
-                    width: 20, height: 20, 
-                    border: `2px solid ${APP_COLORS.PRIMARY}`, 
-                    borderTopColor: 'transparent', 
-                    borderRadius: '50%', 
-                    animation: 'spin 1s linear infinite'
-                  }} />
-                ) : `${t.loadMore} ↓`}
-              </button>
-            )}
-          </div>
-        </>
-      )}
-
-      {activeTab === 'madinaty' && (
-        <MadinatyTab push={push} t={t} isRTL={isRTL} lang={lang} />
-      )}
-
-      <style>
-        {`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-          @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 ${APP_COLORS.PRIMARY}80; }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 10px ${APP_COLORS.PRIMARY}00; }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 ${APP_COLORS.PRIMARY}00; }
-          }
-        `}
-      </style>
-    </div>
-  );
-}
-
-function HeroCarousel({ t, isRTL }: { t: any, isRTL: boolean }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
+  // Hero Slogans Rotation
+  const [sloganIndex, setSloganIndex] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 4000);
+      setSloganIndex((prev) => (prev + 1) % 5);
+    }, 3500);
     return () => clearInterval(timer);
   }, []);
 
-  return (
-    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 20, margin: '20px 20px 0', height: 200 }}>
-      <motion.div 
-        animate={{ x: isRTL ? currentIndex * 100 + '%' : -currentIndex * 100 + '%' }}
-        transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-        style={{
-          display: 'flex',
-          width: '100%',
-          height: '100%'
-        }}
-      >
-        {HERO_SLIDES.map((slide) => (
-          <div key={slide.id} style={{ minWidth: '100%', height: '100%', position: 'relative' }}>
-            <img src={slide.image} alt={slide.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} draggable={false} />
-            <div style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: '60%',
-              background: 'linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0))',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-              padding: 20,
-              textAlign: isRTL ? 'right' : 'left'
-            }}>
-              <h3 style={{ ...TYPOGRAPHY.headline, color: 'white', margin: '0 0 4px 0', fontSize: 18 }}>{slide.title}</h3>
-              <p style={{ ...TYPOGRAPHY.body, color: 'rgba(255,255,255,0.8)', margin: '0 0 12px 0', fontSize: 12 }}>{slide.subtitle}</p>
-              <button style={{
-                backgroundColor: APP_COLORS.PRIMARY,
-                color: 'white',
-                border: 'none',
-                padding: '8px 16px',
-                borderRadius: 8,
-                ...TYPOGRAPHY.headline,
-                fontSize: 14,
-                cursor: 'pointer',
-                alignSelf: isRTL ? 'flex-start' : 'flex-end'
-              }}>
-                {isRTL ? 'استكشف الآن' : 'Explore Now'}
-              </button>
-            </div>
-          </div>
-        ))}
-      </motion.div>
-      <div style={{ position: 'absolute', bottom: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 6 }}>
-        {HERO_SLIDES.map((_, idx) => (
-          <div key={idx} style={{
-            width: idx === currentIndex ? 16 : 6,
-            height: 6,
-            borderRadius: 3,
-            backgroundColor: idx === currentIndex ? APP_COLORS.PRIMARY : 'rgba(255,255,255,0.5)',
-            transition: 'all 0.3s'
-          }} />
-        ))}
-      </div>
-    </div>
-  );
-}
+  const currentGov = GOVERNORATES.find(g => g.id === selectedGovernorate);
+  const cityName = currentGov ? (language === 'ar' ? currentGov.nameAr : language === 'ku' ? currentGov.nameKu : currentGov.nameEn) : '';
 
-function CityFilterBar({ selectedCity, setSelectedCity, lang, isRTL }: { selectedCity: string, setSelectedCity: (id: string) => void, lang: any, isRTL: boolean }) {
+  const slogans = [
+    {
+      ar: t('slogan_1_ar'),
+      ku: t('slogan_1_ku'),
+      en: t('slogan_1_en')
+    },
+    {
+      ar: t('slogan_2_ar').replace('{city}', cityName),
+      ku: t('slogan_2_ku').replace('{city}', cityName),
+      en: t('slogan_2_en')
+    },
+    {
+      ar: t('slogan_3_ar'),
+      ku: t('slogan_3_ku'),
+      en: t('slogan_3_en')
+    },
+    {
+      ar: t('slogan_4_ar'),
+      ku: t('slogan_4_ku'),
+      en: t('slogan_4_en')
+    },
+    {
+      ar: t('slogan_5_ar'),
+      ku: t('slogan_5_ku'),
+      en: t('slogan_5_en')
+    }
+  ];
+
   return (
-    <div className="no-scrollbar" style={{
-      display: 'flex',
-      overflowX: 'auto',
-      padding: '15px 20px',
-      gap: 10,
-      backgroundColor: APP_COLORS.BACKGROUND,
-      position: 'sticky',
-      top: 70,
-      zIndex: 40
-    }}>
-      {GOVERNORATES.map(city => {
-        const isSelected = city.id === selectedCity;
-        return (
+    <div className="flex flex-col min-h-screen bg-[#0a0a0f] text-white relative overflow-x-hidden">
+      {/* 1. HERO SECTION */}
+      <section className="relative w-full h-[180px] bg-gradient-to-b from-[#1a1a2f] to-[#0a0a0f] overflow-hidden flex flex-col justify-center items-center px-6 text-center">
+        <AnimatePresence mode="wait">
           <motion.div
-            key={city.id}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setSelectedCity(city.id)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: isSelected ? APP_COLORS.PRIMARY : APP_COLORS.SURFACE,
-              color: isSelected ? 'white' : APP_COLORS.TEXT_PRIMARY,
-              borderRadius: 20,
-              border: isSelected ? 'none' : `1px solid ${APP_COLORS.BORDER}`,
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-              ...TYPOGRAPHY.headline,
-              fontSize: 14,
-              transition: 'all 0.2s'
-            }}
+            key={sloganIndex}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="flex flex-col gap-1"
           >
-            {city.name[lang]}
+            <h2 
+              className="text-2xl font-bold leading-tight"
+              style={{ fontFamily: (language === 'ar' || language === 'ku') ? "'Noto Naskh Arabic', sans-serif" : "inherit" }}
+            >
+              {slogans[sloganIndex].ar}
+            </h2>
+            <h3 className="text-lg opacity-80 font-medium">
+              {slogans[sloganIndex].ku}
+            </h3>
+            <p className="text-xs opacity-60 tracking-wide uppercase">
+              {slogans[sloganIndex].en}
+            </p>
           </motion.div>
-        );
-      })}
+        </AnimatePresence>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-10">
+          <div className="absolute top-4 start-4 w-24 h-24 rounded-full bg-primary blur-3xl" />
+          <div className="absolute bottom-4 end-4 w-32 h-32 rounded-full bg-secondary blur-3xl" />
+        </div>
+      </section>
+
+      {/* 2. GOVERNORATE CHIPS (TICKER) */}
+      <div className="w-full py-4 bg-[#0a0a0f] border-b border-white/5 overflow-hidden relative group">
+        <div className={`flex whitespace-nowrap hover:pause-ticker touch-pan-x ${isRTL ? 'animate-ticker-rtl' : 'animate-ticker'}`}>
+          {/* Duplicate for infinite effect */}
+          {[...GOVERNORATES, ...GOVERNORATES].map((gov, idx) => {
+            const isSelected = selectedGovernorate === gov.id;
+            const name = language === 'ar' ? gov.nameAr : language === 'ku' ? gov.nameKu : gov.nameEn;
+            return (
+              <motion.button
+                key={`${gov.id}-${idx}`}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setGovernorate(gov.id)}
+                className={`mx-2 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${
+                  isSelected 
+                    ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' 
+                    : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
+                }`}
+              >
+                {name}
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. TABS */}
+      <div className="sticky top-0 z-40 bg-[#0a0a0f]/80 backdrop-blur-md border-b border-white/5">
+        <div className="flex w-full">
+          <TabButton 
+            active={activeTab === 'shakumaku'} 
+            onClick={() => setActiveTab('shakumaku')}
+            label={t('tab_shakumaku')}
+          />
+          <TabButton 
+            active={activeTab === 'madinaty'} 
+            onClick={() => setActiveTab('madinaty')}
+            label={t('tab_madinaty')}
+          />
+        </div>
+        {/* Sliding Underline */}
+        <div className="absolute bottom-0 h-0.5 bg-primary transition-all duration-300 ease-out"
+             style={{ 
+               width: '50%', 
+               insetInlineStart: activeTab === 'shakumaku' ? '0%' : '50%',
+             }} 
+        />
+      </div>
+
+      {/* 4. CONTENT AREA */}
+      <main className="flex-1 pb-24">
+        <AnimatePresence mode="wait">
+          {activeTab === 'shakumaku' ? (
+            <motion.div
+              key="shakumaku"
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ShakumakuTab push={push} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="madinaty"
+              initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isRTL ? 20 : -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <MadinatyTab push={push} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* 5. FLOATING ACTION BUTTON */}
+      <div className="fixed bottom-6 end-6 z-50 flex flex-col items-end gap-3">
+        <AnimatePresence>
+          {showFABMenu && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              className="bg-[#1a1a2f] border border-white/10 rounded-2xl p-2 shadow-2xl min-w-[180px]"
+            >
+              <FABOption 
+                icon={<Camera size={18} />} 
+                label={t('action_add_post')} 
+                onClick={() => { push('AddPost'); setShowFABMenu(false); }} 
+              />
+              <div className="h-px bg-white/5 my-1" />
+              <FABOption 
+                icon={<Store size={18} />} 
+                label={t('action_add_business')} 
+                onClick={() => { push('CategoryBrowse'); setShowFABMenu(false); }} 
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowFABMenu(!showFABMenu)}
+          className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30 text-white"
+        >
+          <motion.div
+            animate={{ rotate: showFABMenu ? 45 : 0 }}
+            transition={{ type: "spring", stiffness: 200 }}
+          >
+            <Plus size={28} />
+          </motion.div>
+        </motion.button>
+      </div>
+
+      <style>{`
+        @keyframes ticker {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes ticker-rtl {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(50%); }
+        }
+        .animate-ticker {
+          animation: ticker 40s linear infinite;
+        }
+        .animate-ticker-rtl {
+          animation: ticker-rtl 40s linear infinite;
+        }
+        .pause-ticker {
+          animation-play-state: paused;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }
 
-function TabBar({ activeTab, setActiveTab, t, isRTL }: { activeTab: TabType, setActiveTab: (tab: TabType) => void, t: any, isRTL: boolean }) {
+function TabButton({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) {
   return (
-    <div style={{
-      display: 'flex',
-      backgroundColor: APP_COLORS.SURFACE,
-      position: 'sticky',
-      top: 125,
-      zIndex: 30
-    }}>
-      <div 
-        onClick={() => setActiveTab('shakumaku')}
-        style={{
-          flex: 1,
-          textAlign: 'center',
-          padding: '15px 0',
-          cursor: 'pointer',
-          color: activeTab === 'shakumaku' ? APP_COLORS.PRIMARY : APP_COLORS.TEXT_SECONDARY,
-          ...TYPOGRAPHY.headline,
-          fontSize: 16,
-          position: 'relative'
-        }}
-      >
-        {t.shakumaku}
-        {activeTab === 'shakumaku' && (
-          <motion.div 
-            layoutId="tabUnderline"
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 3,
-              backgroundColor: APP_COLORS.PRIMARY
-            }}
-          />
-        )}
+    <button 
+      onClick={onClick}
+      className={`flex-1 py-4 text-sm font-bold transition-colors duration-300 ${
+        active ? 'text-primary' : 'text-white/40 hover:text-white/60'
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function FABOption({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-xl transition-colors text-sm font-medium"
+    >
+      <span className="text-primary">{icon}</span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
+// --- SHAKUMAKU TAB ---
+function ShakumakuTab({ push }: { push: (screen: Screen, props?: Record<string, any>) => void }) {
+  const { language, selectedGovernorate, t } = useAppState();
+  const [visibleCount, setVisibleCount] = useState(5);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const filteredPosts = MOCK_FEED_POSTS.filter(p => p.governorate === selectedGovernorate);
+  const visiblePosts = filteredPosts.slice(0, visibleCount);
+
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    setTimeout(() => {
+      setVisibleCount(prev => prev + 5);
+      setLoadingMore(false);
+    }, 800);
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Stories Row */}
+      <div className="flex overflow-x-auto no-scrollbar gap-4 px-6 py-4">
+        <div className="flex flex-col items-center gap-2 min-w-[70px]">
+          <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center bg-white/5">
+            <Plus size={24} className="text-white/40" />
+          </div>
+          <span className="text-[10px] text-white/40 font-medium">Your Story</span>
+        </div>
+        {MOCK_STORIES.map(story => (
+          <StoryCircle key={story.id} story={story} onClick={() => push('StoryViewer', { storyId: story.id })} />
+        ))}
       </div>
-      <div 
-        onClick={() => setActiveTab('madinaty')}
-        style={{
-          flex: 1,
-          textAlign: 'center',
-          padding: '15px 0',
-          cursor: 'pointer',
-          color: activeTab === 'madinaty' ? APP_COLORS.PRIMARY : APP_COLORS.TEXT_SECONDARY,
-          ...TYPOGRAPHY.headline,
-          fontSize: 16,
-          position: 'relative'
-        }}
-      >
-        {t.madinaty}
-        {activeTab === 'madinaty' && (
-          <motion.div 
-            layoutId="tabUnderline"
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 3,
-              backgroundColor: APP_COLORS.PRIMARY
-            }}
-          />
+
+      {/* Reels Row */}
+      <div className="flex flex-col gap-3">
+        <div className="flex justify-between items-center px-6">
+          <h4 className="text-sm font-bold flex items-center gap-2">
+            <Play size={16} className="text-primary fill-primary" />
+            {t('feed_reels_title')}
+          </h4>
+        </div>
+        <div className="flex overflow-x-auto no-scrollbar gap-3 px-6">
+          {MOCK_REELS.map(reel => (
+            <ReelCard key={reel.id} reel={reel} onClick={() => push('PostDetail', { reelId: reel.id })} isRTL={language === 'ar' || language === 'ku'} />
+          ))}
+        </div>
+      </div>
+
+      {/* Feed Posts */}
+      <div className="flex flex-col gap-4 px-4">
+        {visiblePosts.length > 0 ? (
+          <>
+            {visiblePosts.map(post => (
+              <FeedPostCard 
+                key={post.id} 
+                post={post} 
+                onCommentClick={() => push('PostDetail', { post })} 
+                onBusinessClick={(bId) => push('BusinessDetail', { businessId: bId })}
+                isRTL={language === 'ar' || language === 'ku'}
+                t={t}
+              />
+            ))}
+            {visibleCount < filteredPosts.length && (
+              <button 
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-primary font-bold text-sm hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
+              >
+                {loadingMore ? (
+                  <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>{t('feed_load_more')}</span>
+                    <ChevronDown size={16} />
+                  </>
+                )}
+              </button>
+            )}
+          </>
+        ) : (
+          <div className="py-20 flex flex-col items-center justify-center text-center px-10 gap-4">
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-white/20">
+              <MessageCircle size={32} />
+            </div>
+            <p className="text-sm text-white/40 leading-relaxed">
+              {t('feed_no_posts_city')}
+            </p>
+          </div>
         )}
       </div>
     </div>
@@ -429,367 +370,151 @@ function TabBar({ activeTab, setActiveTab, t, isRTL }: { activeTab: TabType, set
 
 function StoryCircle({ story, onClick }: { story: Story, onClick: () => void, key?: any }) {
   return (
-    <div 
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 6,
-        cursor: 'pointer',
-        position: 'relative',
-        width: 70
-      }}
-    >
-      <div style={{
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        padding: 2,
-        background: story.viewed ? APP_COLORS.TEXT_MUTED : APP_COLORS.PRIMARY,
-        position: 'relative',
-        animation: !story.viewed ? 'pulse 2s infinite' : 'none'
-      }}>
-        <img 
-          src={story.avatar} 
-          alt={story.name}
-          style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: 30,
-            objectFit: 'cover',
-            border: `2px solid ${APP_COLORS.SURFACE}`
-          }}
-        />
-        {story.type === 'business' && story.verified && (
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-            backgroundColor: APP_COLORS.SECONDARY,
-            borderRadius: '50%',
-            width: 16,
-            height: 16,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: `2px solid ${APP_COLORS.SURFACE}`
-          }}>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-        )}
-      </div>
-      <span style={{ 
-        fontSize: 11, 
-        color: APP_COLORS.TEXT_PRIMARY, 
-        width: '100%', 
-        textAlign: 'center', 
-        whiteSpace: 'nowrap', 
-        overflow: 'hidden', 
-        textOverflow: 'ellipsis',
-        fontFamily: "'IBM Plex Sans Arabic', sans-serif"
-      }}>
-        {story.name}
-      </span>
-    </div>
-  );
-}
-
-function BusinessCard({ business, onClick }: { business: Business, onClick: () => void, key?: any }) {
-  return (
-    <motion.div 
-      onClick={onClick}
-      whileHover={{ translateY: -2 }}
-      style={{
-        minWidth: 200,
-        backgroundColor: APP_COLORS.SURFACE,
-        borderRadius: 16,
-        overflow: 'hidden',
-        boxShadow: APP_COLORS.SHADOW,
-        cursor: 'pointer',
-        transition: 'box-shadow 0.3s ease'
-      }}
-    >
-      <img src={business.coverImage || business.image} alt={business.name} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
-      <div style={{ padding: 12 }}>
-        <h3 style={{ ...TYPOGRAPHY.headline, margin: '0 0 4px 0', fontSize: 14 }}>{business.name}</h3>
-        <p style={{ ...TYPOGRAPHY.body, margin: '0 0 8px 0', fontSize: 12, color: APP_COLORS.TEXT_SECONDARY }}>{business.category} • {business.city}</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Star size={14} color={APP_COLORS.PREMIUM_GOLD} fill={APP_COLORS.PREMIUM_GOLD} />
-          <span style={{ fontSize: 12, fontWeight: 600 }}>{business.rating}</span>
-          <span style={{ fontSize: 12, color: APP_COLORS.TEXT_MUTED }}>({business.reviewCount || business.reviews})</span>
+    <button onClick={onClick} className="flex flex-col items-center gap-2 min-w-[70px]">
+      <div className={`w-16 h-16 rounded-full p-0.5 ${story.viewed ? 'bg-white/10' : 'bg-gradient-to-tr from-primary to-secondary'}`}>
+        <div className="w-full h-full rounded-full border-2 border-[#0a0a0f] overflow-hidden">
+          <img src={story.avatar} alt={story.name} className="w-full h-full object-cover" />
         </div>
       </div>
-    </motion.div>
+      <span className="text-[10px] text-white/60 font-medium truncate w-full text-center">{story.name}</span>
+    </button>
   );
 }
 
-function InlineStoryCard({ story, onClick }: { story: Story, onClick: () => void }) {
+function ReelCard({ reel, onClick, isRTL }: { reel: Reel, onClick: () => void, isRTL: boolean, key?: any }) {
   return (
-    <motion.div 
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      whileHover={{ translateY: -2 }}
-      style={{
-        backgroundColor: APP_COLORS.SURFACE,
-        borderRadius: 16,
-        marginBottom: 15,
-        boxShadow: APP_COLORS.SHADOW,
-        overflow: 'hidden',
-        position: 'relative',
-        height: 200,
-        cursor: 'pointer',
-        transition: 'box-shadow 0.3s ease'
-      }}
+      className="relative min-w-[120px] h-[200px] rounded-2xl overflow-hidden bg-white/5 group"
     >
-      <img src={story.media[0]} alt={story.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 50%)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
-        padding: 15
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: 20, padding: 2,
-            background: APP_COLORS.PRIMARY
-          }}>
-            <img src={story.avatar} alt={story.name} style={{ width: '100%', height: '100%', borderRadius: 20, border: '2px solid white', objectFit: 'cover' }} />
-          </div>
-          <div>
-            <h4 style={{ color: 'white', margin: 0, fontSize: 14, fontWeight: 'bold', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{story.name}</h4>
-            <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12 }}>شاهد القصة</span>
-          </div>
-        </div>
+      <img src={reel.thumbnailUrl} alt={reel.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+        <Play size={20} fill="white" style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} />
       </div>
-    </motion.div>
+
+      <div className="absolute bottom-3 inset-inline-start-3 inset-inline-end-3 flex flex-col gap-1 text-start">
+        <span className="text-[10px] font-bold text-white truncate">{reel.creatorName}</span>
+        <span className="text-[8px] text-white/60 line-clamp-2 leading-tight">{reel.title}</span>
+      </div>
+    </motion.button>
   );
 }
 
-function MadinatyTab({ push, t, isRTL, lang }: { push: (screen: Screen, props?: Record<string, any>) => void, t: any, isRTL: boolean, lang: string }) {
-  const pressTimerRef = useRef<NodeJS.Timeout | null>(null);
+// --- MADINATY TAB ---
+function MadinatyTab({ push }: { push: (screen: Screen, props?: Record<string, any>) => void }) {
+  const { language, selectedGovernorate, t } = useAppState();
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const PAGE_SIZE = 6;
-
-  const activeCategory = CATEGORIES.find(c => c.id === selectedCategory);
   
-  // Filter businesses
-  let filteredBusinesses = MOCK_BUSINESSES;
-  if (selectedCategory !== 'all') {
-    filteredBusinesses = filteredBusinesses.filter(b => b.category === selectedCategory);
-    if (selectedSubcategory) {
-      filteredBusinesses = filteredBusinesses.filter(b => b.subcategory === selectedSubcategory);
-    }
-  }
+  const { businesses, isLoading, loadMore, hasMore } = useBusinessFilter({
+    governorateId: selectedGovernorate,
+    category: selectedCategory,
+    searchQuery
+  });
 
-  const visibleBusinesses = filteredBusinesses.slice(0, page * PAGE_SIZE);
-  const hasMore = visibleBusinesses.length < filteredBusinesses.length;
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleLoadMore = async () => {
-    setIsLoadingMore(true);
-    await new Promise(r => setTimeout(r, 800)); // simulate fetch
-    setPage(p => p + 1);
-    setIsLoadingMore(false);
+  const handleBusinessClick = (business: Business) => {
+    setSelectedBusiness(business);
+    setIsModalOpen(true);
+  };
+
+  const handleClaimClick = (business: Business) => {
+    push('ClaimBusiness', { business });
   };
 
   return (
-    <div style={{ paddingBottom: 20 }}>
-      {/* Category Filter Row */}
-      <div className="no-scrollbar" style={{
-        display: 'flex',
-        overflowX: 'auto',
-        padding: '15px 20px',
-        gap: 10,
-        backgroundColor: APP_COLORS.SURFACE,
-        borderBottom: `1px solid ${APP_COLORS.BORDER}`
-      }}>
-        {CATEGORIES.map(cat => {
-          const isSelected = selectedCategory === cat.id;
-
-          const handlePressStart = () => {
-            if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
-            pressTimerRef.current = setTimeout(() => {
-              push('CategoryBrowse', { categoryId: cat.id });
-            }, 500); // 500ms for long press
-          };
-
-          const handlePressEnd = () => {
-            if (pressTimerRef.current) {
-              clearTimeout(pressTimerRef.current);
-              pressTimerRef.current = null;
-            }
-          };
-
-          return (
-            <motion.div
-              key={cat.id}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                setSelectedCategory(cat.id);
-                setSelectedSubcategory(null);
-                setPage(1);
-              }}
-              onPointerDown={handlePressStart}
-              onPointerUp={handlePressEnd}
-              onPointerLeave={handlePressEnd}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '8px 16px',
-                backgroundColor: isSelected ? APP_COLORS.PRIMARY : APP_COLORS.SURFACE,
-                border: `1px solid ${isSelected ? APP_COLORS.PRIMARY : APP_COLORS.BORDER}`,
-                borderRadius: 20,
-                color: isSelected ? 'white' : APP_COLORS.TEXT_PRIMARY,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.2s',
-                userSelect: 'none',
-                WebkitUserSelect: 'none'
-              }}
-            >
-              <span style={{ fontSize: 16 }}>{cat.icon}</span>
-              <span style={{ fontSize: 14, fontWeight: isSelected ? 600 : 400 }}>
-                {t[cat.nameKey] || cat.nameKey}
-              </span>
-            </motion.div>
-          );
-        })}
+    <div className="flex flex-col gap-6 px-6 pt-4">
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute inset-inline-start-4 top-1/2 -translate-y-1/2 text-white/30" size={18} />
+        <input 
+          type="text"
+          placeholder={t('madinaty_search_placeholder')}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full h-12 bg-white/5 border border-white/10 rounded-2xl ps-12 pe-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+        />
       </div>
 
-      {/* Subcategory Filter Row */}
-      {activeCategory?.subcategories && (
-        <div className="no-scrollbar" style={{
-          display: 'flex',
-          overflowX: 'auto',
-          padding: '10px 20px',
-          gap: 10,
-          backgroundColor: '#FAFAFA',
-          borderBottom: `1px solid ${APP_COLORS.BORDER}`
-        }}>
-          <div
-            onClick={() => {
-              setSelectedSubcategory(null);
-              setPage(1);
-            }}
-            style={{
-              padding: '6px 14px',
-              backgroundColor: selectedSubcategory === null ? APP_COLORS.TEXT_PRIMARY : 'transparent',
-              border: `1px solid ${selectedSubcategory === null ? APP_COLORS.TEXT_PRIMARY : APP_COLORS.BORDER}`,
-              borderRadius: 16,
-              color: selectedSubcategory === null ? 'white' : APP_COLORS.TEXT_SECONDARY,
-              fontSize: 13,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap'
-            }}
+      {/* Category Pills */}
+      <div className="flex overflow-x-auto no-scrollbar gap-2 py-1">
+        {CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => { setSelectedCategory(cat.id); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap border transition-all ${
+              selectedCategory === cat.id 
+                ? 'bg-primary border-primary text-white' 
+                : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+            }`}
           >
-            {t.all}
-          </div>
-          {activeCategory.subcategories.map(sub => {
-            const isSelected = selectedSubcategory === sub.id;
-            return (
-              <div
-                key={sub.id}
-                onClick={() => {
-                  setSelectedSubcategory(sub.id);
-                  setPage(1);
-                }}
-                style={{
-                  padding: '6px 14px',
-                  backgroundColor: isSelected ? APP_COLORS.TEXT_PRIMARY : 'transparent',
-                  border: `1px solid ${isSelected ? APP_COLORS.TEXT_PRIMARY : APP_COLORS.BORDER}`,
-                  borderRadius: 16,
-                  color: isSelected ? 'white' : APP_COLORS.TEXT_SECONDARY,
-                  fontSize: 13,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {t[sub.nameKey] || sub.nameKey}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Business Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: 15,
-        padding: 20
-      }}>
-        {visibleBusinesses.map(business => (
-          <BusinessGridCard key={business.id} business={business} onClick={() => push('BusinessDetail', { business })} />
+            <span>{cat.icon}</span>
+            <span>{t(cat.nameKey)}</span>
+          </button>
         ))}
       </div>
 
-      {hasMore && (
-        <div style={{ padding: '0 20px' }}>
-          <button 
-            onClick={handleLoadMore}
-            disabled={isLoadingMore}
-            style={{
-              width: '100%',
-              padding: 15,
-              backgroundColor: APP_COLORS.SURFACE,
-              border: `1px solid ${APP_COLORS.BORDER}`,
-              borderRadius: 12,
-              color: APP_COLORS.PRIMARY,
-              ...TYPOGRAPHY.headline,
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            {isLoadingMore ? (
-              <div style={{
-                width: 20, height: 20, 
-                border: `2px solid ${APP_COLORS.PRIMARY}`, 
-                borderTopColor: 'transparent', 
-                borderRadius: '50%', 
-                animation: 'spin 1s linear infinite'
-              }} />
-            ) : `${t.loadMore} ↓`}
-          </button>
+      {/* Business Grid */}
+      {businesses.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4">
+          {businesses.map(business => (
+            <BusinessPostcard 
+              key={business.id} 
+              business={business} 
+              onClick={() => handleBusinessClick(business)}
+              onClaimClick={() => handleClaimClick(business)}
+            />
+          ))}
+          {hasMore && (
+            <div className="col-span-2 mt-2">
+              <button 
+                onClick={loadMore}
+                disabled={isLoading}
+                className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-primary font-bold text-sm hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>{t('feed_load_more')}</span>
+                    <ChevronDown size={16} />
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="py-20 flex flex-col items-center justify-center text-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-white/20">
+            <Store size={32} />
+          </div>
+          <p className="text-sm text-white/40 leading-relaxed px-10">
+            {t('madinaty_no_businesses')}
+          </p>
         </div>
       )}
+
+      <BusinessPostcardModal 
+        business={selectedBusiness}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onClaim={() => {
+          setIsModalOpen(false);
+          if (selectedBusiness) handleClaimClick(selectedBusiness);
+        }}
+        onViewProfile={() => {
+          setIsModalOpen(false);
+          if (selectedBusiness) push('BusinessDetail', { business: selectedBusiness });
+        }}
+      />
     </div>
   );
 }
 
-function BusinessGridCard({ business, onClick }: { business: Business, onClick: () => void, key?: any }) {
-  return (
-    <motion.div 
-      onClick={onClick}
-      whileHover={{ translateY: -2 }}
-      style={{
-        backgroundColor: APP_COLORS.SURFACE,
-        borderRadius: 12,
-        overflow: 'hidden',
-        boxShadow: APP_COLORS.SHADOW,
-        cursor: 'pointer',
-        transition: 'box-shadow 0.3s ease'
-      }}
-    >
-      <img src={business.coverImage || business.image} alt={business.name} style={{ width: '100%', height: 100, objectFit: 'cover' }} />
-      <div style={{ padding: 10 }}>
-        <h3 style={{ ...TYPOGRAPHY.headline, margin: '0 0 2px 0', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{business.name}</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-          <Star size={12} color={APP_COLORS.PREMIUM_GOLD} fill={APP_COLORS.PREMIUM_GOLD} />
-          <span style={{ fontSize: 11, fontWeight: 600 }}>{business.rating}</span>
-        </div>
-        <div style={{ fontSize: 10, color: APP_COLORS.TEXT_SECONDARY }}>{business.city}</div>
-      </div>
-    </motion.div>
-  );
-}
